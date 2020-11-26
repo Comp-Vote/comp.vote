@@ -1,7 +1,7 @@
 import Layout from "components/layout"; // Layout wrapper
 import styles from "styles/page.module.scss"; // Page styles
 
-export default function Delegate() {
+export default function Delegate({ response }) {
   return (
     <Layout>
       <div className={styles.head}>
@@ -14,7 +14,18 @@ export default function Delegate() {
           </p>
         </div>
       </div>
-      <span>Delegate</span>
+      <div className={styles.body}>
+        <div>
+          <div className={styles.card}>
+            <div>
+              <h4>Delegates</h4>
+            </div>
+            <div>
+              <span>Delegates</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </Layout>
   );
 }

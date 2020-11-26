@@ -43,7 +43,8 @@
             font-size: 15px;
             color: #fff;
             text-decoration: none;
-            transition: padding 0.2 ease;
+            padding-bottom: 0.2rem;
+            transition: padding 0.2s ease;
           }
 
           a:hover {
@@ -110,7 +111,6 @@
 // Active navigation link override
 .active {
   color: #00d395 !important;
-  padding-bottom: 0.5rem;
   border-bottom: 1px solid #00d395;
 }
 

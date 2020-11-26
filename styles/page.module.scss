@@ -2,9 +2,9 @@
 .head {
   background-color: #070a0e;
 
-  div {
+  > div {
     max-width: 1100px;
-    padding: 80px 20px 80px 20px;
+    padding: 80px 20px 100px 20px;
     width: calc(100% - 40px);
     margin: 0px auto;
 
@@ -13,15 +13,39 @@
       margin-block-start: 0px;
     }
 
-    p {
+    div {
+      display: inline-block;
       color: rgb(170, 184, 193);
       max-width: 600px;
       padding: 25px;
       background-color: rgb(20, 30, 39);
       border-radius: 2px;
-      font-size: 16px;
-      line-height: 26px;
       margin-top: 32px;
+      vertical-align: middle;
+      min-height: 43px;
+
+      p {
+        font-size: 16px;
+        line-height: 26px;
+      }
+
+      h2 {
+        margin: 0px 0px 1px 0px;
+        color: white;
+        font-size: 1.39rem;
+        font-weight: normal;
+      }
+
+      h3 {
+        font-size: 13px;
+        font-weight: 500;
+        color: #aab8c1;
+        margin: 0px;
+      }
+    }
+
+    div:nth-of-type(2) {
+      margin-left: 30px;
     }
   }
 }
@@ -43,7 +67,7 @@
   box-shadow: 0px 2px 4px rgb(16 21 24 / 5%);
   border-radius: 4px;
 
-  div:nth-of-type(1) {
+  > div:nth-of-type(1) {
     padding: 16px 28px;
     font-size: 16px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -56,7 +80,146 @@
     }
   }
 
-  div:nth-of-type(2) {
-    padding-bottom: 1000px;
+  > div:nth-of-type(3) {
+    padding: 1.145rem 1.9375rem;
+    text-align: center;
+
+    button {
+      background: transparent;
+      border: none;
+      text-transform: uppercase;
+      color: #050f19;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      color: #00d395;
+    }
+
+    button:focus {
+      outline: none;
+    }
+  }
+}
+
+.proposal {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-left: 2px solid transparent;
+
+  div {
+    display: inline-block;
+    height: 100%;
+  }
+
+  div:nth-child(2) {
+    float: right;
+
+    button {
+      transform: translateY(6px);
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      margin: 0px 8px;
+      border-radius: 5px;
+      border: 1px solid;
+      background-color: transparent;
+      transition: 0.2s ease-in, color 0.2s ease-in;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    button:hover {
+      color: white;
+    }
+  }
+
+  h4 {
+    margin: 0px;
+    font-size: 1.125rem;
+    line-height: 1.35;
+    color: #070a0e;
+    font-weight: normal;
+  }
+
+  span {
+    color: #aab8c1;
+    font-weight: 500;
+    font-size: 13px;
+    padding-top: 5px;
+    display: block;
+  }
+}
+
+.proposal:hover {
+  border-left-color: #00d395;
+}
+
+.info {
+  border-color: #657786;
+  color: #657786;
+}
+
+.info:hover {
+  background-color: #657786 !important;
+}
+
+.for {
+  border-color: #00d395;
+  color: #00d395;
+}
+
+.for:hover {
+  background-color: #00d395 !important;
+}
+
+.against {
+  border-color: rgb(214, 2, 44);
+  color: rgb(214, 2, 44);
+}
+
+.against:hover {
+  background-color: rgb(214, 2, 44) !important;
+}
+
+@media screen and (max-width: 1100px) {
+  .proposal {
+    > div {
+      display: block;
+      float: none !important;
+
+      button:nth-of-type(1) {
+        margin-left: 0px;
+      }
+    }
+
+    > div:nth-of-type(2) {
+      padding-top: 10px;
+    }
+  }
+}
+
+@media screen and (max-width: 870px) {
+  .head > div > div {
+    max-width: 100%;
+    width: calc(100% - 50px);
+    margin-left: 0px !important;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .proposal {
+    > div {
+      button {
+        margin: 5px 0px !important;
+        width: 100%;
+      }
+    }
   }
 }
