@@ -112,21 +112,34 @@ export default function Home({ defaultProposals, defaultPages }) {
 
                     {/* Proposal actions */}
                     <div>
-                      {web3 ? (
-                        // If authenticated, return voting + info buttons
-                        <>
-                          <button className={styles.info}>Info</button>
-                          <button className={styles.for}>Vote For</button>
-                          <button className={styles.against}>
-                            Vote Against
-                          </button>
-                        </>
-                      ) : (
-                        // Else, return button to authenticate
-                        <button className={styles.info} onClick={authenticate}>
-                          Authenticate to vote
-                        </button>
-                      )}
+                         {web3 && proposal.states[proposal.states.length - 1].state.localeCompare("active") == 0 &&
+                            (
+                            // If active and auth, info and voting buttons
+                            <>
+                              <button className={styles.info}>Info</button>
+                              <button className={styles.for}>Vote For</button>
+                              <button className={styles.against}>
+                                Vote Against
+                              </button>
+                            </>
+                          )}
+
+                         {!web3 && proposal.states[proposal.states.length - 1].state.localeCompare("active") == 0 &&
+                         (
+                           // If active and not authenticated, prompt authentication
+                           <>
+                             <button className={styles.info} onClick={authenticate}>
+                                Authenticate to vote
+                              </button>
+                           </>
+                         )}
+
+                         {proposal.states[proposal.states.length - 1].state.localeCompare("active") != 0 && (
+                           // If not active, show info only
+                           <>
+                             <button className={styles.info}>Info</button>
+                           </>
+                         )}
                     </div>
                   </div>
                 );
