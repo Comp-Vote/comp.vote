@@ -1,0 +1,62 @@
+// Page header
+.head {
+  background-color: #070a0e;
+
+  div {
+    max-width: 1100px;
+    padding: 80px 20px 80px 20px;
+    width: calc(100% - 40px);
+    margin: 0px auto;
+
+    h1 {
+      color: white;
+      margin-block-start: 0px;
+    }
+
+    p {
+      color: rgb(170, 184, 193);
+      max-width: 600px;
+      padding: 25px;
+      background-color: rgb(20, 30, 39);
+      border-radius: 2px;
+      font-size: 16px;
+      line-height: 26px;
+      margin-top: 32px;
+    }
+  }
+}
+
+// Page body
+.body {
+  > div {
+    max-width: 1100px;
+    padding: 0px 20px;
+    width: calc(100% - 40px);
+    margin: 0px auto;
+    transform: translateY(-62px);
+  }
+}
+
+// Body governance cards
+.card {
+  background-color: white;
+  box-shadow: 0px 2px 4px rgb(16 21 24 / 5%);
+  border-radius: 4px;
+
+  div:nth-of-type(1) {
+    padding: 16px 28px;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    h4 {
+      margin: 0px;
+      font-size: 18px;
+      line-height: 28px;
+      color: rgb(20, 30, 39);
+    }
+  }
+
+  div:nth-of-type(2) {
+    padding-bottom: 1000px;
+  }
+}

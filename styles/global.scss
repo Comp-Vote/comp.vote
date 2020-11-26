@@ -1,0 +1,33 @@
+// Font - regular
+@font-face {
+  font-family: "Neue Haas Grotesk";
+  src: url("/fonts/NHaasGroteskTXPro-55Rg.ttf");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Font - medium
+@font-face {
+  font-family: "Neue Haas Grotesk";
+  src: url("/fonts/NHaasGroteskTXPro-65Md.ttf");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Font - bold
+@font-face {
+  font-family: "Neue Haas Grotesk";
+  src: url("/fonts/NHaasGroteskTXPro-75Bd.ttf");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Global setup
+body {
+  margin: 0px;
+  background-color: rgb(249, 250, 251);
+  font-family: "Neue Haas Grotesk", sans-serif;
+}

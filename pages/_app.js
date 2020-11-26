@@ -1,7 +1,12 @@
-import '../styles/globals.css'
+import "styles/global.scss"; // Global styles
+import GlobalProvider from "containers"; // Context provider
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+// Export application
+export default function CompVote({ Component, pageProps }) {
+  return (
+    // Wrap page in context provider
+    <GlobalProvider>
+      <Component {...pageProps} />
+    </GlobalProvider>
+  );
 }
-
-export default MyApp
