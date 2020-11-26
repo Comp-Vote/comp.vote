@@ -13,17 +13,16 @@ const compToken = new web3.eth.Contract(compAbi,'0xc00e94cb662c3520282e6f5717214
 const governanceAlpha = new web3.eth.Contract(governanceAlphaAbi,'0xc0da01a04c3f3e0be433606045bb7017a7323e38');
 
 
-async function canDelegate(address,delegateTo="0x") {
-	let fromAddress = address;
+async function canDelegate(address,delegatee="0x") {
 
-	if(fromAddress === undefined) {
+	if(address === undefined) {
 		console.log('from address false');
 		return false;
 	}
-	fromAddress = address.toString().toLowerCase()
-	let compBalance,currentDelegate,delAllowed;
+	address = address.toString().toLowerCase()
+	let compBalance,currentDelegatee,delAllowed;
 	try {
-		[compBalance,currentDelegate,delAllowed] = await Promise.all([
+		[compBalance,currentDelegatee,delAllowed] = await Promise.all([
 			compToken.methods.balanceOf(fromAddress).call(),
 			compToken.methods.delegates(fromAddress).call(),
 			delegationAllowed(fromAddress)
@@ -34,32 +33,30 @@ async function canDelegate(address,delegateTo="0x") {
 		return false;
 	}
 	console.log(compBalance);
-	console.log(currentDelegate);
+	console.log(currentDelegatee);
 	console.log(delAllowed);
-	return delAllowed && compBalance >= 1e18 && (delegateTo == "0x" || delegateTo.toLowerCase().compareLocale(currentDelegate.toLowerCase()) == 0);
+	return delAllowed && compBalance >= 1e18 && (delegatee == "0x" || delegatee.toString().toLowerCase().compareLocale(currentDelegatee.toString().toLowerCase()) == 0);
 };
 
-async function canVote(address,propId) {
-	let fromAddress = address;
-	let proposalId = propId;
+async function canVote(address,proposalId) {
 
-	if(fromAddress === undefined || proposalId === undefined) {
+	if(address === undefined || proposalId === undefined) {
 		console.log('invalid params');
 		return false;
 	}
 
-	fromAddress = fromAddress.toString().toLowerCase();
+	address = address.toString().toLowerCase();
 
 	let proposal,votesDelegated,receipt,currentBlock,vAllowed;
 
 	try {
 		[proposal,receipt,currentBlock,vAllowed] = await Promise.all([
 			governanceAlpha.methods.proposals(proposalId).call(),
-			governanceAlpha.methods.getReceipt(proposalId,fromAddress).call(),
+			governanceAlpha.methods.getReceipt(proposalId,address).call(),
 			web3.eth.getBlockNumber(),
-			voteAllowed(fromAddress,proposalId)
+			voteAllowed(address,proposalId)
 		]);
-		votesDelegated = await compToken.methods.getPriorVotes(fromAddress,proposal.startBlock).call();
+		votesDelegated = await compToken.methods.getPriorVotes(address,proposal.startBlock).call();
 	}
 	catch(err) {
 		console.log('reverted');
@@ -74,10 +71,104 @@ async function canVote(address,propId) {
 
 	return votesDelegated > 1e18 && !receipt.hasVoted && vAllowed;
 }
+async function vote(address, proposalId, support, v, r, s) {
+	if(proposalId === undefined || support === undefined || address === undefined || v === undefined || r === undefined || s === undefined) {
+		return false;
+	}
+
+	address = address.toString().toLowerCase();
+
+    let sigAddress, canVoteVerified
+
+    try {
+	    [sigAddress, canVoteVerified] = await Promise.all([
+	    	sigRelayer.methods.signatoryFromVoteSig(proposalId, support, v, r, s).call().toString().toLowerCase(),
+	    	canVote(address, proposalId)
+	    ]);
+	}
+	catch {
+		return false;
+	}
+
+    if(address.compareLocale(sigAddress.toString().toLowerCase()) != 0) {
+    	return false;
+    }
+
+    if(!canVoteVerified) {
+    	return false;
+    }
+
+    let newTx;
+    newTx.v = v;
+    newTx.r = r;
+    newTx.s = s;
+    newTx.support = support;
+    newTx.from = address;
+	newTx.type = 'vote';
+	newTx.createdAt = new Date();
+	newTx.executed = false;
+
+	try {
+		await insertVoteTx(newTx);
+	}
+
+	catch {
+		return false;
+	}
+	axios.get(process.env.NOTIFICATION_HOOK + 'New comp.vote voting sig');
+	return true;
+}
+
+async function delegate(address, delegatee, v, r, s) {
+	if(address === undefined || delegatee === undefined) {
+		return false;
+	}
+
+	address = address.toString().toLowerCase();
+	delegatee = delegatee.toString().toLowerCase();
+
+	let sigAddress, canDelegateVerified;
+
+	[sigAddress, canDelegateVerified] = await Promise.all([
+		sigRelayer.methods.signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s).call().toString().toLowerCase(),
+		canDelegate(address, delegatee)
+	]);
+
+	if(sigAddress.compareLocale(address) != 0) {
+		return false;
+	}
+
+	if(!canDelegateVerified) {
+		return false;
+	}
+
+	let newTx;
+
+	newTx.from = address;
+	newTx.v = v;
+	newTx.r = r;
+	newTx.s = s;
+	newTx.type = 'delegate';
+	newTx.createdAt = new Date();
+	newTx.executed = false;
+
+	try {
+		await insertDelegateTx(newTx);
+	}
+	catch {
+		return false;
+	}
+	axios.get(process.env.NOTIFICATION_HOOK + 'New comp.vote delegation sig');
+	return true;
+}
 
 module.exports = {
 	canDelegate,
-	canVote
+	canVote,
+	vote,
+	delegate
 }
+
+
 
 
