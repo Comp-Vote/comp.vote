@@ -11,6 +11,12 @@ export default async function handler(req, res) {
   const nonce = newTx.nonce;
   const expiry = newTx.expiry;
 
-  let val = await delegate(address, delegatee, nonce, expiry, v, r, s);
-  res.end(JSON.stringify({ result: val }));
+  // Validate and submit tx. Reverts on error with message and code
+  try {
+    await delegate(address, delegatee, nonce, expiry, v, r, s);
+  } catch (err) {
+    res.status(err.code).json(JSON.stringify({ message: err.message }));
+    return;
+  }
+  res.status(200).json(JSON.stringify({ message: "successful" }));
 }

@@ -11,7 +11,12 @@ export default async function handler(req, res) {
   const r = newTx.r;
   const s = newTx.s;
 
-  // Validate and submit tx. Reverts on error. True on success.
-  let val = await vote(address, proposalId, support, v, r, s);
-  res.end(JSON.stringify({ result: val }));
+  // Validate and submit tx. Reverts on error with message and code
+  try {
+    await vote(address, proposalId, support, v, r, s);
+  } catch (err) {
+    res.status(err.code).json(JSON.stringify({ message: err.message }));
+    return;
+  }
+  res.status(200).json(JSON.stringify({ message: "successful" }));
 }

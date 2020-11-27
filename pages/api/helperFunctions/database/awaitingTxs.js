@@ -28,9 +28,11 @@ async function delegationAllowed(address) {
     .find({ from: address, type: "delegate", executed: false })
     .toArray();
   if (existingUserTxs.length > 0) {
-    throw new Error(
-      "User has pending delegate txs. Please wait before queueing more."
+    const err = new Error(
+      "user has pending delegate txs. Please wait before queueing more"
     );
+    err.code = 403;
+    throw err;
   }
   const delegationsInPastWeek = await database
     .collection(collectionName)
@@ -43,9 +45,9 @@ async function delegationAllowed(address) {
     })
     .toArray();
   if (delegationsInPastWeek.length > 0) {
-    throw new Error("Only one delegation allowed per week.");
-  } else {
-    return true;
+    const err = new Error("only one delegation allowed per week");
+    err.code = 403;
+    throw err;
   }
 }
 
@@ -75,9 +77,9 @@ async function voteAllowed(address, proposalId) {
     .find({ from: address, proposalId: proposalId, type: "vote" })
     .toArray();
   if (existingUserTxs.length > 0) {
-    throw new Error("User already voted for this proposal.");
-  } else {
-    return true;
+    const err = new Error("user already voted for this proposal");
+    err.code = 409;
+    throw err;
   }
 }
 

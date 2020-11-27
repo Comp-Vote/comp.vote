@@ -54,33 +54,47 @@ async function runMiddleware(req, res) {
  */
 async function canDelegate(address, delegatee = "0x") {
   if (address === undefined) {
-    return false;
+    const err = new Error("invalid address input");
+    err.code = 422;
+    throw err;
   }
   address = address.toString().toLowerCase();
 
   // Gets the address onchain COMP balance, current address
   // delegated to and checks if database for delegationAllowed
-  let compBalance, currentDelegatee, delAllowed;
+  let compBalance, currentDelegatee;
   try {
-    [compBalance, currentDelegatee, delAllowed] = await Promise.all([
+    [compBalance, currentDelegatee] = await Promise.all([
       compToken.methods.balanceOf(address).call(),
       compToken.methods.delegates(address).call(),
       delegationAllowed(address),
     ]);
   } catch (err) {
-    return false;
+    if (typeof err.code == "number") {
+      throw err;
+    }
+    const newErr = new Error("error fetching data from blockchain");
+    newErr.code = 500;
+    throw newErr;
   }
   // Enforces a min COMP balance of 1
+  if (compBalance <= 1e18) {
+    const err = new Error("COMP balance too low");
+    err.code = 403;
+    throw err;
+  }
   // If delegatee is specified, must not match existing delegatee
-  return (
-    delAllowed &&
-    compBalance >= 1e18 &&
-    (delegatee == "0x" ||
-      delegatee
-        .toString()
-        .toLowerCase()
-        .localeCompare(currentDelegatee.toString().toLowerCase()) != 0)
-  );
+  if (
+    delegatee != "0x" &&
+    delegatee
+      .toString()
+      .toLowerCase()
+      .localeCompare(currentDelegatee.toString().toLowerCase()) == 0
+  ) {
+    const err = new Error("delegatee can not be current delegatee");
+    err.code = 403;
+    throw err;
+  }
 }
 
 /**
@@ -89,8 +103,10 @@ async function canDelegate(address, delegatee = "0x") {
  * @param {Number} proposalId
  */
 async function canVote(address, proposalId) {
-  if (address === undefined || proposalId === undefined) {
-    return false;
+  if (typeof address == "undefined" || typeof proposalId == "undefined") {
+    const err = new Error("invalid input");
+    err.code = 422;
+    throw err;
   }
 
   address = address.toString().toLowerCase();
@@ -103,11 +119,9 @@ async function canVote(address, proposalId) {
   let receipt;
   // Current chain block
   let currentBlock;
-  // Database validity check
-  let vAllowed;
 
   try {
-    [proposal, receipt, currentBlock, vAllowed] = await Promise.all([
+    [proposal, receipt, currentBlock] = await Promise.all([
       governanceAlpha.methods.proposals(proposalId).call(),
       governanceAlpha.methods.getReceipt(proposalId, address).call(),
       web3.eth.getBlockNumber(),
@@ -117,7 +131,13 @@ async function canVote(address, proposalId) {
       .getPriorVotes(address, proposal.startBlock)
       .call();
   } catch (err) {
-    return false;
+    if (typeof err.code == "number") {
+      // error thrown from DB vote allowed. Throw to res
+      throw err;
+    }
+    const newErr = new Error("error fetching data from blockchain");
+    newErr.code = 500;
+    throw newErr;
   }
 
   // Not ongoing proposal. Leaves a 5 block buffer for last minute relay
@@ -128,11 +148,24 @@ async function canVote(address, proposalId) {
     ) ||
     proposal.canceled
   ) {
-    return false;
+    const err = new Error("proposal voting period is not active");
+    err.code = 400;
+    throw err;
   }
 
-  // Require at least 1 COMP delegated and address has not voted yet
-  return votesDelegated > 1e18 && !receipt.hasVoted && vAllowed;
+  // Require at least 1 COMP delegated
+  if (votesDelegated < 1e18) {
+    const err = new Error("must have at least 1 COMP delegated");
+    err.code = 403;
+    throw err;
+  }
+
+  // address has not voted yet
+  if (receipt.hasVoted) {
+    const err = new Error("address already voted");
+    err.code = 400;
+    throw err;
+  }
 }
 
 /**
@@ -146,18 +179,18 @@ async function canVote(address, proposalId) {
  */
 async function vote(address, proposalId, support, v, r, s) {
   if ([address, proposalId, support, v, r, s].includes(undefined)) {
-    return false;
+    const err = new Error("invalid input");
+    err.code = 422;
+    throw err;
   }
 
   address = address.toString().toLowerCase();
 
   // Address verified used to create signature
   let sigAddress;
-  // Result of canVote function
-  let canVoteVerified;
 
   try {
-    [sigAddress, canVoteVerified] = await Promise.all([
+    sigAddress = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
         .call()
@@ -166,18 +199,21 @@ async function vote(address, proposalId, support, v, r, s) {
       canVote(address, proposalId),
     ]);
   } catch (err) {
-    return false;
+    if (typeof err.code == "number") {
+      throw err;
+    }
+    const newErr = new Error("error fetching data from blockchain");
+    newErr.code = 500;
+    throw newErr;
   }
 
   sigAddress = sigAddress.toString().toLowerCase();
 
   // Address verified to create sig and alleged must match
   if (address.localeCompare(sigAddress.toString().toLowerCase()) != 0) {
-    return false;
-  }
-
-  if (!canVoteVerified) {
-    return false;
+    const err = new Error("given address does not match signer address");
+    err.code = 422;
+    throw err;
   }
 
   let newTx = {};
@@ -190,31 +226,30 @@ async function vote(address, proposalId, support, v, r, s) {
   newTx.createdAt = new Date();
   newTx.executed = false;
 
-  try {
-    await insertVoteTx(newTx);
-  } catch (err) {
-    return false;
-  }
+  await insertVoteTx(newTx);
 
   // Send notification to admin using telegram
-  axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
-  return true;
+  if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
+    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
+  }
 }
 
 /**
  * Validates the given delegate by sig data and saves it to the database
- * @param {*} address that created the signature
- * @param {*} delegatee to delegate to
- * @param {*} nonce
- * @param {*} expiry UNIX time when signature expires
- * @param {*} v
- * @param {*} r
- * @param {*} s
+ * @param {String} address that created the signature
+ * @param {String} delegatee to delegate to
+ * @param {Number} nonce
+ * @param {Number} expiry UNIX time when signature expires
+ * @param {String} v
+ * @param {String} r
+ * @param {String} s
  */
 async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   // Validate input data
   if ([address, delegatee, nonce, expiry, v, r, s].includes(undefined)) {
-    return false;
+    const err = new Error("invalid input");
+    err.code = 422;
+    throw err;
   }
 
   address = address.toString().toLowerCase();
@@ -222,25 +257,30 @@ async function delegate(address, delegatee, nonce, expiry, v, r, s) {
 
   // Address verified used to create signature
   let sigAddress;
-  // Result of canDelegate function
-  let canDelegateVerified;
 
-  [sigAddress, canDelegateVerified] = await Promise.all([
-    sigRelayer.methods
-      .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
-      .call(),
-    canDelegate(address, delegatee),
-  ]);
+  try {
+    sigAddress = await Promise.all([
+      sigRelayer.methods
+        .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
+        .call(),
+      canDelegate(address, delegatee),
+    ]);
+  } catch (err) {
+    if (typeof err.code == "number") {
+      throw err;
+    }
+    const newErr = new Error("error fetching data from blockchain");
+    newErr.code = 500;
+    throw newErr;
+  }
 
   sigAddress = sigAddress.toString().toLowerCase();
 
   // Address verified to create sig and alleged must match
   if (sigAddress.localeCompare(address) != 0) {
-    return false;
-  }
-
-  if (!canDelegateVerified) {
-    return false;
+    const err = new Error("given address does not match signer address");
+    err.code = 422;
+    throw err;
   }
 
   let newTx = {};
@@ -255,14 +295,11 @@ async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   newTx.createdAt = new Date();
   newTx.executed = false;
 
-  try {
-    await insertDelegateTx(newTx);
-  } catch (err) {
-    return false;
-  }
+  await insertDelegateTx(newTx);
 
-  axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
-  return true;
+  if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
+    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
+  }
 }
 
 module.exports = {
