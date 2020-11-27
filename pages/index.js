@@ -1,8 +1,8 @@
 import axios from "axios"; // Requests wrapper
 import dayjs from "dayjs"; // Dayjs
 import { useState } from "react"; // State management
-import { web3p } from "containers"; // Web3
 import Layout from "components/layout"; // Layout wrapper
+import { web3p, vote } from "containers"; // Context
 import styles from "styles/page.module.scss"; // Page styles
 
 export default function Home({ defaultProposals, defaultPages }) {
@@ -12,6 +12,7 @@ export default function Home({ defaultProposals, defaultPages }) {
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
+  const { voteFor, voteAgainst } = vote.useContainer();
 
   /**
    * Util: Uppercase first letter of word
@@ -48,6 +49,20 @@ export default function Home({ defaultProposals, defaultPages }) {
 
     // Toggle loading state
     setLoading(false);
+  };
+
+  /**
+   * Opens Compoung Governance proposal information in new tab
+   * @param {Number} proposalId for Compound governance proposal
+   */
+  const proposalInfo = (proposalId) => {
+    // Navigate
+    window.open(
+      // With target set to Compound governance proposal
+      `https://compound.finance/governance/proposals/${proposalId}`,
+      // In new tab
+      "_blank"
+    );
   };
 
   return (
@@ -112,34 +127,34 @@ export default function Home({ defaultProposals, defaultPages }) {
 
                     {/* Proposal actions */}
                     <div>
-                         {web3 && proposal.states[proposal.states.length - 1].state.localeCompare("active") == 0 &&
-                            (
-                            // If active and auth, info and voting buttons
-                            <>
-                              <button className={styles.info}>Info</button>
-                              <button className={styles.for}>Vote For</button>
-                              <button className={styles.against}>
-                                Vote Against
-                              </button>
-                            </>
-                          )}
-
-                         {!web3 && proposal.states[proposal.states.length - 1].state.localeCompare("active") == 0 &&
-                         (
-                           // If active and not authenticated, prompt authentication
-                           <>
-                             <button className={styles.info} onClick={authenticate}>
-                                Authenticate to vote
-                              </button>
-                           </>
-                         )}
-
-                         {proposal.states[proposal.states.length - 1].state.localeCompare("active") != 0 && (
-                           // If not active, show info only
-                           <>
-                             <button className={styles.info}>Info</button>
-                           </>
-                         )}
+                      {web3 ? (
+                        // If authenticated, return voting + info buttons
+                        <>
+                          <button
+                            onClick={() => proposalInfo(proposal.id)}
+                            className={styles.info}
+                          >
+                            Info
+                          </button>
+                          <button
+                            onClick={() => voteFor(proposal.id)}
+                            className={styles.for}
+                          >
+                            Vote For
+                          </button>
+                          <button
+                            onClick={() => voteAgainst(proposal.id)}
+                            className={styles.against}
+                          >
+                            Vote Against
+                          </button>
+                        </>
+                      ) : (
+                        // Else, return button to authenticate
+                        <button className={styles.info} onClick={authenticate}>
+                          Authenticate to vote
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

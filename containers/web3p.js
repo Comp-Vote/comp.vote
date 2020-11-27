@@ -28,7 +28,7 @@ function useWeb3() {
     const web3Modal = new Web3Modal({
       network: "mainnet",
       cacheProvider: true,
-      providerOptions,
+      providerOptions: providerOptions,
     });
 
     // Set web3Modal
