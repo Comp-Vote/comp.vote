@@ -3,11 +3,9 @@ import fs from "fs";
 import axios from "axios";
 import Cors from "cors";
 
-import { startDatabase } from "./database/mongo";
 import {
   insertDelegateTx,
   insertVoteTx,
-  getTxs,
   delegationAllowed,
   voteAllowed,
 } from "./database/awaitingTxs";
@@ -50,9 +48,7 @@ async function runMiddleware(req, res) {
 }
 
 async function canDelegate(address, delegatee = "0x") {
-  console.log("got here 1");
   if (address === undefined) {
-    console.log("from address false");
     return false;
   }
   address = address.toString().toLowerCase();
@@ -64,16 +60,8 @@ async function canDelegate(address, delegatee = "0x") {
       delegationAllowed(address),
     ]);
   } catch (err) {
-    console.log("reverted");
-    console.log(err);
     return false;
   }
-  console.log(compBalance);
-  console.log(currentDelegatee);
-  console.log(delAllowed);
-  console.log("got here 2");
-  console.log(compBalance >= 1e18);
-  console.log(delegatee == "0x");
   return (
     delAllowed &&
     compBalance >= 1e18 &&
@@ -87,7 +75,6 @@ async function canDelegate(address, delegatee = "0x") {
 
 async function canVote(address, proposalId) {
   if (address === undefined || proposalId === undefined) {
-    console.log("invalid params");
     return false;
   }
 
@@ -106,8 +93,6 @@ async function canVote(address, proposalId) {
       .getPriorVotes(address, proposal.startBlock)
       .call();
   } catch (err) {
-    console.log("reverted");
-    console.log(err);
     return false;
   }
 
@@ -118,7 +103,6 @@ async function canVote(address, proposalId) {
     ) ||
     proposal.canceled
   ) {
-    console.log("Voting period over");
     return false;
   }
 
@@ -142,7 +126,7 @@ async function vote(address, proposalId, support, v, r, s) {
         .toLowerCase(),
       canVote(address, proposalId),
     ]);
-  } catch {
+  } catch (err) {
     return false;
   }
 
@@ -166,7 +150,7 @@ async function vote(address, proposalId, support, v, r, s) {
 
   try {
     await insertVoteTx(newTx);
-  } catch {
+  } catch (err) {
     return false;
   }
   axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
@@ -212,14 +196,11 @@ async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   newTx.createdAt = new Date();
   newTx.executed = false;
 
-  console.log("here 1");
-
   try {
     await insertDelegateTx(newTx);
-  } catch {
+  } catch (err) {
     return false;
   }
-  console.log("here 3");
 
   axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
   return true;

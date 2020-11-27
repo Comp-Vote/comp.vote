@@ -36,7 +36,6 @@ async function insertDelegateTx(tx) {
 }
 
 async function delegationAllowed(address) {
-  console.log("Running delegation allowed");
   const database = await getDatabase();
   const delegationsInPastWeek = await database
     .collection(collectionName)
@@ -49,10 +48,8 @@ async function delegationAllowed(address) {
     })
     .toArray();
   if (delegationsInPastWeek.length > 0) {
-    console.log("returning error");
     throw new Error("Only one delegation allowed per week.");
   } else {
-    console.log("returning true");
     return true;
   }
 }
