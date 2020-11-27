@@ -16,9 +16,9 @@ async function insertDelegateTx(tx) {
 }
 
 /**
- * Does database data validation for delegation. Checks 
+ * Does database data validation for delegation. Checks
  * if user has pending tx or tx in past week.
- * @param {String} address 
+ * @param {String} address
  */
 async function delegationAllowed(address) {
   const database = await getDatabase();
@@ -65,8 +65,8 @@ async function insertVoteTx(tx) {
 /**
  * Validates vote tx based on database data. Checks if user
  * has already submitted a sig for this proposal.
- * @param {String} address 
- * @param {Number} proposalId 
+ * @param {String} address
+ * @param {Number} proposalId
  */
 async function voteAllowed(address, proposalId) {
   const database = await getDatabase();

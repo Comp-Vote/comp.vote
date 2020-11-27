@@ -50,7 +50,7 @@ async function runMiddleware(req, res) {
 /**
  * Checks if address can delegate by sig to given delegatee
  * @param {String} address to delegate from
- * @param {String} delegatee address to delegate to (optional) 
+ * @param {String} delegatee address to delegate to (optional)
  */
 async function canDelegate(address, delegatee = "0x") {
   if (address === undefined) {
@@ -85,8 +85,8 @@ async function canDelegate(address, delegatee = "0x") {
 
 /**
  * Checks if an address can vote by sig for the given proposal
- * @param {String} address 
- * @param {Number} proposalId 
+ * @param {String} address
+ * @param {Number} proposalId
  */
 async function canVote(address, proposalId) {
   if (address === undefined || proposalId === undefined) {
@@ -94,7 +94,7 @@ async function canVote(address, proposalId) {
   }
 
   address = address.toString().toLowerCase();
-  
+
   // On chain proposal data
   let proposal;
   // On chain votes delegated at start of proposal
@@ -102,7 +102,7 @@ async function canVote(address, proposalId) {
   // Address proposal receipt. Stores voting status
   let receipt;
   // Current chain block
-  let currentBlock; 
+  let currentBlock;
   // Database validity check
   let vAllowed;
 
@@ -139,10 +139,10 @@ async function canVote(address, proposalId) {
  * Validates the given vote by sig data and saves it to the database
  * @param {String} address that created the signature
  * @param {Number} proposalId to vote on
- * @param {bool} support 
- * @param {String} v 
- * @param {String} r 
- * @param {String} s 
+ * @param {bool} support
+ * @param {String} v
+ * @param {String} r
+ * @param {String} s
  */
 async function vote(address, proposalId, support, v, r, s) {
   if ([address, proposalId, support, v, r, s].includes(undefined)) {
@@ -151,7 +151,7 @@ async function vote(address, proposalId, support, v, r, s) {
 
   address = address.toString().toLowerCase();
 
-  // Address verified used to create signature 
+  // Address verified used to create signature
   let sigAddress;
   // Result of canVote function
   let canVoteVerified;
@@ -170,7 +170,7 @@ async function vote(address, proposalId, support, v, r, s) {
   }
 
   sigAddress = sigAddress.toString().toLowerCase();
-  
+
   // Address verified to create sig and alleged must match
   if (address.localeCompare(sigAddress.toString().toLowerCase()) != 0) {
     return false;
@@ -202,14 +202,14 @@ async function vote(address, proposalId, support, v, r, s) {
 }
 
 /**
- * Validates the given delegate by sig data and saves it to the database 
+ * Validates the given delegate by sig data and saves it to the database
  * @param {*} address that created the signature
  * @param {*} delegatee to delegate to
- * @param {*} nonce 
+ * @param {*} nonce
  * @param {*} expiry UNIX time when signature expires
- * @param {*} v 
- * @param {*} r 
- * @param {*} s 
+ * @param {*} v
+ * @param {*} r
+ * @param {*} s
  */
 async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   // Validate input data
@@ -220,7 +220,7 @@ async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   address = address.toString().toLowerCase();
   delegatee = delegatee.toString().toLowerCase();
 
-  // Address verified used to create signature 
+  // Address verified used to create signature
   let sigAddress;
   // Result of canDelegate function
   let canDelegateVerified;
