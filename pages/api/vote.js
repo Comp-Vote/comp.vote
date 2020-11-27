@@ -1,6 +1,7 @@
-const {vote} = require('./helperFunctions');
+import {vote,runMiddleware} from "./helperFunctions";
 export default async function handler(req, res) {
-
+    await runMiddleware(req,res);
+    
     const newTx = req.body;
     const proposalId = newTx.proposalId;
     const support = newTx.support;

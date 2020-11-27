@@ -1,5 +1,7 @@
-const {canVote} = require('./helperFunctions');
+import {canVote,runMiddleware} from "./helperFunctions";
 export default async function handler(req, res) {
-  const val = await canVote(req.query.address,req.query.proposalId);
-  res.end(JSON.stringify({ result: val}));
+	await runMiddleware(req,res);
+
+	const val = await canVote(req.query.address,req.query.proposalId);
+	res.end(JSON.stringify({ result: val}));
 }

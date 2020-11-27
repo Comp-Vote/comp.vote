@@ -1,7 +1,6 @@
-const {getDatabase} = require('./mongo');
+import {getDatabase} from "./mongo";
 
 const collectionName = 'awaitingTxs';
-const testing = false;
 
 async function insertDelegateTx(tx) {
   const database = await getDatabase();
@@ -14,11 +13,9 @@ async function insertDelegateTx(tx) {
   const delegationsInPastWeek = await database.collection(collectionName).find({createdAt: {
         $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000)
     }, from: tx.from, type: 'delegate'}).toArray();
-  if(delegationsInPastWeek.length > 0 && !testing) {
+  if(delegationsInPastWeek.length > 0) {
     throw new Error('Only one delegation allowed per week.');
   }
-
-
 
   const {insertedId} = await database.collection(collectionName).insertOne(tx);
   return insertedId;
@@ -30,7 +27,7 @@ async function delegationAllowed(address) {
   const delegationsInPastWeek = await database.collection(collectionName).find({createdAt: {
         $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000)
     }, from: address, type: 'delegate'}).toArray();
-  if(delegationsInPastWeek.length > 0 && !testing) {
+  if(delegationsInPastWeek.length > 0) {
     console.log('returning error');
     throw new Error('Only one delegation allowed per week.');
   }

@@ -1,9 +1,12 @@
 
-const {startDatabase} = require('./database/mongo');
-const {insertDelegateTx, insertVoteTx , getTxs, delegationAllowed, voteAllowed} = require('./database/awaitingTxs');
-const Web3 = require('web3');
-const fs = require('fs');
-const axios = require('axios');
+import Web3 from "web3";
+import fs from "fs";
+import axios from "axios";
+import Cors from "cors";
+
+import {startDatabase} from "./database/mongo";
+import {insertDelegateTx, insertVoteTx , getTxs, delegationAllowed, voteAllowed} from "./database/awaitingTxs";
+
 const web3 = new Web3(process.env.WEB3_URL);
 const sigRelayerAbi = JSON.parse(fs.readFileSync('pages/api/helperFunctions/abi/SigRelayer.abi'));
 const compAbi = JSON.parse(fs.readFileSync('pages/api/helperFunctions/abi/comp.abi'));
@@ -13,8 +16,22 @@ const compToken = new web3.eth.Contract(compAbi,'0xc00e94cb662c3520282e6f5717214
 const governanceAlpha = new web3.eth.Contract(governanceAlphaAbi,'0xc0da01a04c3f3e0be433606045bb7017a7323e38');
 
 
-async function canDelegate(address,delegatee="0x") {
+async function runMiddleware(req,res) {
+	const cors = Cors({
+		methods: ['GET','POST']
+	})
+	return new Promise((resolve, rejected) => {
+		cors(req,res, (result) => {
+			if(result instanceof Error) {
+				return rejected(result)
+			}
+			return resolve(result)
+		})
+	})
+}
 
+async function canDelegate(address,delegatee="0x") {
+	console.log('got here 1');
 	if(address === undefined) {
 		console.log('from address false');
 		return false;
@@ -23,19 +40,23 @@ async function canDelegate(address,delegatee="0x") {
 	let compBalance,currentDelegatee,delAllowed;
 	try {
 		[compBalance,currentDelegatee,delAllowed] = await Promise.all([
-			compToken.methods.balanceOf(fromAddress).call(),
-			compToken.methods.delegates(fromAddress).call(),
-			delegationAllowed(fromAddress)
+			compToken.methods.balanceOf(address).call(),
+			compToken.methods.delegates(address).call(),
+			delegationAllowed(address)
 		]);
 	}
-	catch {
+	catch(err) {
 		console.log('reverted');
+		console.log(err);
 		return false;
 	}
 	console.log(compBalance);
 	console.log(currentDelegatee);
 	console.log(delAllowed);
-	return delAllowed && compBalance >= 1e18 && (delegatee == "0x" || delegatee.toString().toLowerCase().compareLocale(currentDelegatee.toString().toLowerCase()) == 0);
+	console.log('got here 2');
+	console.log(compBalance >= 1e18)
+	console.log(delegatee == "0x")
+	return delAllowed && compBalance >= 1e18 && (delegatee == "0x" || delegatee.toString().toLowerCase().localeCompare(currentDelegatee.toString().toLowerCase()) != 0);
 };
 
 async function canVote(address,proposalId) {
@@ -72,7 +93,7 @@ async function canVote(address,proposalId) {
 	return votesDelegated > 1e18 && !receipt.hasVoted && vAllowed;
 }
 async function vote(address, proposalId, support, v, r, s) {
-	if(proposalId === undefined || support === undefined || address === undefined || v === undefined || r === undefined || s === undefined) {
+	if([address,proposalId,support,v,r,s].includes(undefined)) {
 		return false;
 	}
 
@@ -90,7 +111,7 @@ async function vote(address, proposalId, support, v, r, s) {
 		return false;
 	}
 
-    if(address.compareLocale(sigAddress.toString().toLowerCase()) != 0) {
+    if(address.localeCompare(sigAddress.toString().toLowerCase()) != 0) {
     	return false;
     }
 
@@ -98,7 +119,7 @@ async function vote(address, proposalId, support, v, r, s) {
     	return false;
     }
 
-    let newTx;
+    let newTx = {};
     newTx.v = v;
     newTx.r = r;
     newTx.s = s;
@@ -119,8 +140,8 @@ async function vote(address, proposalId, support, v, r, s) {
 	return true;
 }
 
-async function delegate(address, delegatee, v, r, s) {
-	if(address === undefined || delegatee === undefined) {
+async function delegate(address, delegatee, nonce, expiry, v, r, s) {
+	if([address,delegatee,nonce,expiry,v,r,s].includes(undefined)) {
 		return false;
 	}
 
@@ -130,27 +151,34 @@ async function delegate(address, delegatee, v, r, s) {
 	let sigAddress, canDelegateVerified;
 
 	[sigAddress, canDelegateVerified] = await Promise.all([
-		sigRelayer.methods.signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s).call().toString().toLowerCase(),
+		sigRelayer.methods.signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s).call(),
 		canDelegate(address, delegatee)
 	]);
 
-	if(sigAddress.compareLocale(address) != 0) {
+	sigAddress = sigAddress.toString().toLowerCase()
+
+	if(sigAddress.localeCompare(address) != 0) {
 		return false;
 	}
+
 
 	if(!canDelegateVerified) {
 		return false;
 	}
 
-	let newTx;
+	let newTx = {};
 
 	newTx.from = address;
 	newTx.v = v;
 	newTx.r = r;
 	newTx.s = s;
+	newTx.nonce = nonce;
+	newTx.expiry = expiry;
 	newTx.type = 'delegate';
 	newTx.createdAt = new Date();
 	newTx.executed = false;
+
+	console.log('here 1')
 
 	try {
 		await insertDelegateTx(newTx);
@@ -158,6 +186,8 @@ async function delegate(address, delegatee, v, r, s) {
 	catch {
 		return false;
 	}
+	console.log('here 3')
+
 	axios.get(process.env.NOTIFICATION_HOOK + 'New comp.vote delegation sig');
 	return true;
 }
@@ -166,7 +196,8 @@ module.exports = {
 	canDelegate,
 	canVote,
 	vote,
-	delegate
+	delegate,
+	runMiddleware
 }
 
 
