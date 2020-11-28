@@ -1,3 +1,4 @@
+import axios from "axios"; // Axios requests
 import { web3p } from "containers"; // Web3
 import { createContainer } from "unstated-next"; // Unstated-next containerization
 
@@ -78,8 +79,8 @@ function useVote() {
     const msgParams = createVoteBySigMessage(proposalId, true);
     const signedMsg = await signVote(msgParams);
 
-    // TODO: Setup post to server with signedMsg
-    console.log(signedMsg);
+    // POST vote to server
+    await castVote(proposalId, false, signedMsg);
   };
 
   /**
@@ -91,8 +92,42 @@ function useVote() {
     const msgParams = createVoteBySigMessage(proposalId, false);
     const signedMsg = await signVote(msgParams);
 
-    // TODO: Setup post to server with signedMsg
-    console.log(web3);
+    // POST vote to server
+    await castVote(proposalId, false, signedMsg);
+  };
+
+  /**
+   * POSTS vote to back-end
+   * @param {Number} proposalId of compound governance proposal
+   * @param {boolean} support indicating for || against status for proposal
+   * @param {string} signedMsg from Web3
+   */
+  const castVote = async (proposalId, support, signedMsg) => {
+    // Collect r, s, v
+    const r = "0x" + signedMsg.substring(2, 66);
+    const s = "0x" + signedMsg.substring(66, 130);
+    const v = "0x" + signedMsg.substring(130, 132);
+
+    // Post to back-end
+    axios
+      .post("/api/vote", {
+        address,
+        r,
+        s,
+        v,
+        proposalId,
+        support,
+      })
+      // If successful
+      .then(() => {
+        // Alert successful
+        alert("Success!");
+      })
+      // Else,
+      .catch((error) => {
+        // Alert error message
+        alert("Error: " + error.response.data.message);
+      });
   };
 
   return {
