@@ -1,19 +1,43 @@
-import { MongoClient } from "mongodb";
+import { MongoClient } from "mongodb"; // MongoClient setup
+const { MONGODB_URL, MONGODB_DB } = process.env; // MongoDB URL and table name
 
-let database = null;
+// Cached connection handler
+let cached = global.mongo;
+if (!cached) cached = global.mongo = {};
 
-async function startDatabase() {
-  const mongoDBURL = process.env.MONGODB_URL;
-  const connection = await MongoClient.connect(mongoDBURL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  database = connection.db();
+/**
+ * Return mongoDB connection (cached || fresh)
+ */
+export async function connectToDatabase() {
+  // If cached connection exists on global, return
+  if (cached.conn) return cached.conn;
+
+  // Else generate connection and return
+  if (!cached.promise) {
+    const conn = {}; // Connection
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }; // MongoDB options
+
+    // Generate new connection
+    cached.promise = MongoClient.connect(MONGODB_URL, options)
+      // On successful connection
+      .then((client) => {
+        // Setup global client
+        conn.client = client;
+        // Return client
+        return client.db(MONGODB_DB);
+      })
+      // Follow-up for DB caching
+      .then((db) => {
+        // Cache db and connection
+        conn.db = db;
+        cached.conn = conn;
+      });
+  }
+
+  // Run cached promise and return connection
+  await cached.promise;
+  return cached.conn;
 }
-
-async function getDatabase() {
-  if (!database) await startDatabase();
-  return database;
-}
-
-export { getDatabase, startDatabase };
