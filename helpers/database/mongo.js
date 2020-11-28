@@ -27,7 +27,7 @@ export async function connectToDatabase() {
         // Setup global client
         conn.client = client;
         // Return client
-        return client.db(MONGODB_DB);
+        return client.db().collection(MONGODB_DB);
       })
       // Follow-up for DB caching
       .then((db) => {
