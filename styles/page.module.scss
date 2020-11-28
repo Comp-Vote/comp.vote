@@ -162,7 +162,113 @@
   }
 }
 
-.proposal:hover {
+.legend {
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+
+  span {
+    color: #aab8c1;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  span:nth-child(2) {
+    position: absolute;
+    top: calc(50% - 6px);
+    right: 395px;
+  }
+
+  span:nth-child(3) {
+    position: absolute;
+    top: calc(50% - 6px);
+    right: 245px;
+  }
+}
+
+.delegate {
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-left: 2px solid transparent;
+
+  div {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+
+    img {
+      height: 27px;
+      width: 27px;
+      border-radius: 50%;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+
+    button {
+      vertical-align: middle;
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      margin: 0px 8px;
+      border-radius: 5px;
+      border: 1px solid;
+      background-color: transparent;
+      transition: 0.2s ease-in, color 0.2s ease-in;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    button:hover {
+      color: white;
+    }
+  }
+
+  div:nth-child(1) {
+    width: 30px;
+
+    span {
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+
+  div:nth-child(2) {
+    width: 50px;
+
+    img {
+      vertical-align: middle;
+    }
+  }
+
+  div:nth-child(3) {
+    width: calc(100% - 500px);
+  }
+
+  div:nth-child(4) {
+    width: 120px;
+  }
+
+  div:nth-child(5) {
+    width: 80px;
+    padding-right: 20px;
+    text-align: right;
+  }
+
+  div:nth-child(6) {
+    width: 200px;
+    text-align: right;
+  }
+}
+
+.proposal:hover,
+.delegate:hover {
   border-left-color: #00d395;
 }
 
@@ -215,6 +321,45 @@
     max-width: 100%;
     width: calc(100% - 50px);
     margin-left: 0px !important;
+  }
+
+  .legend {
+    span:nth-of-type(2),
+    span:nth-of-type(3) {
+      display: none;
+    }
+  }
+
+  .delegate {
+    div {
+      font-size: 0.875rem;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    div:nth-child(2) {
+      width: 35px;
+    }
+
+    div:nth-child(3) {
+      width: 105px;
+    }
+
+    div:nth-child(4),
+    div:nth-child(5) {
+      display: none;
+    }
+
+    div:nth-child(6) {
+      width: calc(100% - 170px);
+
+      button {
+        font-size: 12px;
+      }
+    }
   }
 }
 
