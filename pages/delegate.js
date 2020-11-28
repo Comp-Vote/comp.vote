@@ -7,11 +7,13 @@ export default function Delegate({ response }) {
       <div className={styles.head}>
         <div>
           <h1>Delegate By Signature</h1>
-          <p>
-            Delegating by signature lets you delegate your COMP to community
-            members without having to send your transactions on-chain, saving
-            fees.
-          </p>
+          <div>
+            <p>
+              Delegating by signature lets you delegate your COMP to community
+              members without having to send your transactions on-chain, saving
+              fees.
+            </p>
+          </div>
         </div>
       </div>
       <div className={styles.body}>

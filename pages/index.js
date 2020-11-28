@@ -73,9 +73,11 @@ export default function Home({ defaultProposals, defaultPages }) {
           {/* Description of voting by signature */}
           <h1>Vote By Signature</h1>
           <div>
-            Voting by signature lets you place votes across Compound Goverance
-            proposals, without having to send your transactions on-chain, saving
-            fees.
+            <p>
+              Voting by signature lets you place votes across Compound Goverance
+              proposals, without having to send your transactions on-chain,
+              saving fees.
+            </p>
           </div>
 
           {/* Number of voteable proposals */}
