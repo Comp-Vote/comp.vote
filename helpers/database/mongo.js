@@ -16,7 +16,4 @@ async function getDatabase() {
   return database;
 }
 
-module.exports = {
-  getDatabase,
-  startDatabase,
-};
+export { getDatabase, startDatabase };

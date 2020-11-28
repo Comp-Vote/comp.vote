@@ -1,4 +1,5 @@
-import { vote, runMiddleware } from "./helperFunctions";
+import { vote, runMiddleware } from "helpers";
+
 export default async function handler(req, res) {
   // Runs CORS middleware
   await runMiddleware(req, res);

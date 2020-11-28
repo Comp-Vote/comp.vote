@@ -88,7 +88,7 @@ async function getTxs() {
   return await database.collection(collectionName).find({}).toArray();
 }
 
-module.exports = {
+export {
   insertDelegateTx,
   insertVoteTx,
   getTxs,

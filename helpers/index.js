@@ -1,5 +1,5 @@
-import Web3 from "web3";
 import fs from "fs";
+import Web3 from "web3";
 import axios from "axios";
 import Cors from "cors";
 
@@ -8,17 +8,13 @@ import {
   insertVoteTx,
   delegationAllowed,
   voteAllowed,
-} from "./database/awaitingTxs";
+} from "helpers/database/awaitingTxs";
 
-const web3 = new Web3(process.env.WEB3_URL);
-const sigRelayerAbi = JSON.parse(
-  fs.readFileSync("pages/api/helperFunctions/abi/SigRelayer.abi")
-);
-const compAbi = JSON.parse(
-  fs.readFileSync("pages/api/helperFunctions/abi/comp.abi")
-);
+const web3 = new Web3(process.env.NEXT_PUBLIC_INFURA_RPC);
+const sigRelayerAbi = JSON.parse(fs.readFileSync("helpers/abi/SigRelayer.abi"));
+const compAbi = JSON.parse(fs.readFileSync("helpers/abi/comp.abi"));
 const governanceAlphaAbi = JSON.parse(
-  fs.readFileSync("pages/api/helperFunctions/abi/GovernorAlpha.abi")
+  fs.readFileSync("helpers/abi/GovernorAlpha.abi")
 );
 const sigRelayer = new web3.eth.Contract(
   sigRelayerAbi,
@@ -302,10 +298,4 @@ async function delegate(address, delegatee, nonce, expiry, v, r, s) {
   }
 }
 
-module.exports = {
-  canDelegate,
-  canVote,
-  vote,
-  delegate,
-  runMiddleware,
-};
+export { canDelegate, canVote, vote, delegate, runMiddleware };
