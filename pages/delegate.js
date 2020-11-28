@@ -17,8 +17,6 @@ export default function Delegate({
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
 
-  console.log(accounts);
-
   /**
    * Pagination handler
    */
@@ -50,8 +48,10 @@ export default function Delegate({
 
   return (
     <Layout>
+      {/* Page head */}
       <div className={styles.head}>
         <div>
+          {/* Description of delegating by signature */}
           <h1>Delegate By Signature</h1>
           <div>
             <p>
@@ -62,61 +62,96 @@ export default function Delegate({
           </div>
         </div>
       </div>
+
+      {/* Page body */}
       <div className={styles.body}>
         <div>
+          {/* Top addresses by voting weight card */}
           <div className={styles.card}>
+            {/* Card header */}
             <div>
               <h4>Addresses by Voting Weight</h4>
             </div>
+
+            {/* Card legend */}
             <div className={styles.legend}>
               <span>Rank</span>
               <span>Vote Weight</span>
               <span>Proposals Voted</span>
             </div>
+
+            {/* Card delegates content */}
             <div>
               {accounts.map((delegate, i) => {
+                // For each delegate
                 return (
+                  // Render delegate card
                   <div className={styles.delegate} key={i}>
+                    {/* Delegate rank by vote weight */}
                     <div>
                       <span>{delegate.rank}</span>
                     </div>
+
+                    {/* Delegate avatar */}
                     <div>
                       {delegate.image_url ? (
+                        // If avatar provided, use image_url
                         <img src={delegate.image_url} alt="Delegate avatar" />
                       ) : (
+                        // Else generate avatar based on address
                         <img
                           src={`https://icotar.com/avatar/${delegate.address}.png?s=50`}
                           alt="Delegate avatar"
                         />
                       )}
                     </div>
+
+                    {/* Delegate name */}
                     <div>
                       <a
+                        // Link name to Etherscan address
                         href={`https://etherscan.io/address/${delegate.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {delegate.display_name
-                          ? delegate.display_name
-                          : delegate.address.substr(0, 4) +
-                            "..." +
-                            delegate.address.slice(delegate.address.length - 4)}
+                        {
+                          // If delegate has display name
+                          delegate.display_name
+                            ? // Show custom display name
+                              delegate.display_name
+                            : // Else, show truncated address
+                              delegate.address.substr(0, 4) +
+                              "..." +
+                              delegate.address.slice(
+                                delegate.address.length - 4
+                              )
+                        }
                       </a>
                     </div>
+
+                    {/* Delegate vote weight */}
                     <div>
                       <span>
-                        {(
-                          (parseFloat(delegate.votes) / delegated) *
-                          100
-                        ).toFixed(2)}
+                        {
+                          // Calculate vote weight (total / delegate) * 100
+                          (
+                            (parseFloat(delegate.votes) / delegated) *
+                            100
+                          ).toFixed(2)
+                        }
                         %
                       </span>
                     </div>
+
+                    {/* Delegate voted proposal count */}
                     <div>
                       <span>{delegate.proposals_voted}</span>
                     </div>
+
+                    {/* Delegate action buttons */}
                     <div>
                       <button
+                        // If web3 ? delegate function : authenticate state
                         onClick={
                           web3 ? () => console.log("Test") : authenticate
                         }
@@ -141,6 +176,8 @@ export default function Delegate({
               </div>
             ) : null}
           </div>
+
+          {/* Custom address delegation card */}
           <div className={styles.card}>
             <div>
               <h4>Custom Address</h4>
@@ -177,6 +214,7 @@ export async function getServerSideProps() {
         // Maximum number of paginated proposal pages
         max: response.data.pagination_summary.total_pages,
       },
+      // Total delegated vote count
       defaultDelegated: parseFloat(historyResponse.data.votes_delegated),
     },
   };
