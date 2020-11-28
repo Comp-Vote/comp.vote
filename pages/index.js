@@ -129,34 +129,42 @@ export default function Home({ defaultProposals, defaultPages }) {
 
                     {/* Proposal actions */}
                     <div>
-                      {web3 ? (
-                        // If authenticated, return voting + info buttons
-                        <>
+                      <button
+                        onClick={() => proposalInfo(proposal.id)}
+                        className={styles.info}
+                      >
+                        Info
+                      </button>
+                      {proposal.states[proposal.states.length - 1].state ===
+                      "active" ? (
+                        // Check if proposal is active
+                        web3 ? (
+                          // If authenticated and proposal active, return voting + info buttons
+                          <>
+                            <button
+                              onClick={() => voteFor(proposal.id)}
+                              className={styles.for}
+                            >
+                              Vote For
+                            </button>
+                            <button
+                              onClick={() => voteAgainst(proposal.id)}
+                              className={styles.against}
+                            >
+                              Vote Against
+                            </button>
+                          </>
+                        ) : (
+                          // Else, return button to authenticate for active proposals
                           <button
-                            onClick={() => proposalInfo(proposal.id)}
                             className={styles.info}
+                            onClick={authenticate}
                           >
-                            Info
+                            Authenticate to vote
                           </button>
-                          <button
-                            onClick={() => voteFor(proposal.id)}
-                            className={styles.for}
-                          >
-                            Vote For
-                          </button>
-                          <button
-                            onClick={() => voteAgainst(proposal.id)}
-                            className={styles.against}
-                          >
-                            Vote Against
-                          </button>
-                        </>
-                      ) : (
-                        // Else, return button to authenticate
-                        <button className={styles.info} onClick={authenticate}>
-                          Authenticate to vote
-                        </button>
-                      )}
+                        )
+                      ) : // Else, return only Info button
+                      null}
                     </div>
                   </div>
                 );
@@ -166,7 +174,7 @@ export default function Home({ defaultProposals, defaultPages }) {
             {/* More proposals loading button */}
             {pages.current < pages.max ? (
               // If current number of pages < max, show:
-              <div>
+              <div className={styles.cardMore}>
                 {/* Load more proposals button */}
                 <button onClick={getNextPage} disabled={loading}>
                   {loading ? "Loading..." : "Load More Proposals"}

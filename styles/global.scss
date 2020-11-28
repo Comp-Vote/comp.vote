@@ -31,3 +31,17 @@ body {
   background-color: rgb(249, 250, 251);
   font-family: "Neue Haas Grotesk", sans-serif;
 }
+
+// nProgress bar overrides
+#nprogress .bar {
+  background: #00d395 !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #00d395, 0 0 5px #00d395 !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #00d395 !important;
+  border-left-color: #00d395 !important;
+}

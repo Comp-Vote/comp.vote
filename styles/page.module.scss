@@ -80,29 +80,33 @@
       color: rgb(20, 30, 39);
     }
   }
+}
 
-  > div:nth-of-type(3) {
-    padding: 1.145rem 1.9375rem;
-    text-align: center;
+.cardMore {
+  padding: 1.145rem 1.9375rem;
+  text-align: center;
 
-    button {
-      background: transparent;
-      border: none;
-      text-transform: uppercase;
-      color: #050f19;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      color: #00d395;
-    }
-
-    button:focus {
-      outline: none;
-    }
+  button {
+    background: transparent;
+    border: none;
+    text-transform: uppercase;
+    color: #050f19;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
   }
+
+  button:hover {
+    color: #00d395;
+  }
+
+  button:focus {
+    outline: none;
+  }
+}
+
+.card:nth-of-type(2) {
+  margin-top: 20px;
 }
 
 .proposal {
