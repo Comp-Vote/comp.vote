@@ -1,40 +1,49 @@
-import { getDatabase } from "./mongo";
+import { connectToDatabase } from "helpers/database/mongo"; // Mongo connection
 
+// Database collection name
 const collectionName = "awaitingTxs";
 
 /**
  * Inserts delegate tx to the database
  * @param {Object} tx dictionary containing the signature data
  */
-async function insertDelegateTx(tx) {
-  const database = await getDatabase();
+const insertDelegateTx = async (tx) => {
+  // Collect database connection
+  const { db } = await connectToDatabase();
 
-  const { insertedId } = await database
-    .collection(collectionName)
-    .insertOne(tx);
+  // Insert delegate transaction
+  const { insertedId } = await db.collection(collectionName).insertOne(tx);
+
+  // Return insertionId
   return insertedId;
-}
+};
 
 /**
  * Does database data validation for delegation. Checks
  * if user has pending tx or tx in past week.
  * @param {String} address
  */
-async function delegationAllowed(address) {
-  const database = await getDatabase();
+const delegationAllowed = async (address) => {
+  // Collect database connection
+  const { db } = await connectToDatabase();
 
-  const existingUserTxs = await database
+  // Check for existing transactions from user
+  const existingUserTxs = await db
     .collection(collectionName)
     .find({ from: address, type: "delegate", executed: false })
     .toArray();
+
+  // If existing transactions, throw error
   if (existingUserTxs.length > 0) {
-    const err = new Error(
+    const error = new Error(
       "user has pending delegate txs. Please wait before queueing more"
     );
-    err.code = 403;
-    throw err;
+    error.code = 403;
+    throw error;
   }
-  const delegationsInPastWeek = await database
+
+  // Check for delegations in past week
+  const delegationsInPastWeek = await db
     .collection(collectionName)
     .find({
       createdAt: {
@@ -44,10 +53,12 @@ async function delegationAllowed(address) {
       type: "delegate",
     })
     .toArray();
+
+  // If delegations in past week, throw error
   if (delegationsInPastWeek.length > 0) {
-    const err = new Error("only one delegation allowed per week");
-    err.code = 403;
-    throw err;
+    const error = new Error("only one delegation allowed per week");
+    error.code = 403;
+    throw error;
   }
 }
 
@@ -56,13 +67,18 @@ async function delegationAllowed(address) {
  * @param {Object} tx dictionary containing the signature data
  * @returns {String} insertedId Id of the inserted tx
  */
-async function insertVoteTx(tx) {
-  const database = await getDatabase();
-  const { insertedId } = await database
+const insertVoteTx = async (tx) => {
+  // Collect database connection
+  const { db } = await getDatabase();
+
+  // Insert vote
+  const { insertedId } = await db
     .collection(collectionName)
     .insertOne(tx);
+
+  // Return inserted vote id
   return insertedId;
-}
+};
 
 /**
  * Validates vote tx based on database data. Checks if user
@@ -70,24 +86,36 @@ async function insertVoteTx(tx) {
  * @param {String} address
  * @param {Number} proposalId
  */
-async function voteAllowed(address, proposalId) {
-  const database = await getDatabase();
-  let existingUserTxs = await database
+const voteAllowed = async (address, proposalId) => {
+  // Collect database connection
+  const { db } = await getDatabase();
+
+  // Collect existing user transactions
+  const existingUserTxs = await db
     .collection(collectionName)
     .find({ from: address, proposalId: proposalId, type: "vote" })
     .toArray();
+
+  // If existing transactions, throw error
   if (existingUserTxs.length > 0) {
-    const err = new Error("user already voted for this proposal");
-    err.code = 409;
-    throw err;
+    const error = new Error("user already voted for this proposal");
+    error.code = 409;
+    throw error;
   }
-}
+};
 
-async function getTxs() {
-  const database = await getDatabase();
-  return await database.collection(collectionName).find({}).toArray();
-}
+/**
+ * Returns all prending transactions from database
+ */
+const getTxs = () => {
+  // Collect database connection
+  const { db } = await getDatabase();
 
+  // Return pending transactions
+  return await db.collection(collectionName).find({}).toArray();
+};
+
+// Export functions
 export {
   insertDelegateTx,
   insertVoteTx,
