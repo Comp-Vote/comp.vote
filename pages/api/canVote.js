@@ -9,7 +9,9 @@ export default async (req, res) => {
     await canVote(address, proposalId);
   } catch (error) {
     // Check for error
-    res.status(error.code).send(error.message);
+    res.status(error.code).send({
+      message: error.message,
+    });
     return;
   }
 

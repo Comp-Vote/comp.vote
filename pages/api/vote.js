@@ -15,7 +15,10 @@ export default async (req, res) => {
     );
   } catch (error) {
     // If error, send code and message
-    res.status(error.code).end(error.message);
+    res.status(error.code).send({
+      message: error.message,
+    });
+    return;
   }
 
   // Else, return success

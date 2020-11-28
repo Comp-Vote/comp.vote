@@ -8,7 +8,9 @@ export default async (req, res) => {
     await canDelegate(address);
   } catch (error) {
     // If error, return response
-    res.status(error.code).send(error.message);
+    res.status(error.code).send({
+      message: error.message,
+    });
     return;
   }
 

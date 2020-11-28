@@ -60,7 +60,7 @@ const delegationAllowed = async (address) => {
     error.code = 403;
     throw error;
   }
-}
+};
 
 /**
  * Inserts vote tx to the database
@@ -72,9 +72,7 @@ const insertVoteTx = async (tx) => {
   const { db } = await getDatabase();
 
   // Insert vote
-  const { insertedId } = await db
-    .collection(collectionName)
-    .insertOne(tx);
+  const { insertedId } = await db.collection(collectionName).insertOne(tx);
 
   // Return inserted vote id
   return insertedId;
@@ -107,7 +105,7 @@ const voteAllowed = async (address, proposalId) => {
 /**
  * Returns all prending transactions from database
  */
-const getTxs = () => {
+const getTxs = async () => {
   // Collect database connection
   const { db } = await getDatabase();
 
