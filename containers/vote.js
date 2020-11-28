@@ -1,3 +1,4 @@
+import axios from "axios"; // Axios requests
 import { web3p } from "containers"; // Web3
 import { createContainer } from "unstated-next"; // Unstated-next containerization
 
@@ -78,8 +79,8 @@ function useVote() {
     const msgParams = createVoteBySigMessage(proposalId, true);
     const signedMsg = await signVote(msgParams);
 
-    // TODO: Setup post to server with signedMsg
-    console.log(signedMsg);
+    // POST vote to server
+    await castVote(proposalId, false, signedMsg);
   };
 
   /**
@@ -91,8 +92,25 @@ function useVote() {
     const msgParams = createVoteBySigMessage(proposalId, false);
     const signedMsg = await signVote(msgParams);
 
-    // TODO: Setup post to server with signedMsg
-    console.log(web3);
+    // POST vote to server
+    await castVote(proposalId, false, signedMsg);
+  };
+
+  const castVote = async (proposalId, support, signedMsg) => {
+    const r = "0x" + signedMsg.substring(2, 66);
+    const s = "0x" + signedMsg.substring(66, 130);
+    const v = "0x" + signedMsg.substring(130, 132);
+
+    const response = await axios.post("/api/vote", {
+      address,
+      r,
+      s,
+      v,
+      proposalId,
+      support,
+    });
+
+    console.log(response);
   };
 
   return {

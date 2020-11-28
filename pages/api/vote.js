@@ -1,23 +1,23 @@
-import { vote, runMiddleware } from "helpers";
+import { vote } from "helpers"; // Vote helper
 
-export default async function handler(req, res) {
-  // Runs CORS middleware
-  await runMiddleware(req, res);
+export default async (req, res) => {
+  const transaction = req.body; // Collect transaction object
 
-  const newTx = req.body;
-  const proposalId = newTx.proposalId;
-  const support = newTx.support;
-  const address = newTx.address;
-  const v = newTx.v;
-  const r = newTx.r;
-  const s = newTx.s;
-
-  // Validate and submit tx. Reverts on error with message and code
   try {
-    await vote(address, proposalId, support, v, r, s);
-  } catch (err) {
-    res.status(err.code).json(JSON.stringify({ message: err.message }));
-    return;
+    // Send vote
+    await vote(
+      transaction.address,
+      transaction.proposalId,
+      transaction.support,
+      transaction.v,
+      transaction.r,
+      transaction.s
+    );
+  } catch (error) {
+    // If error, send code and message
+    res.status(error.code).end(error.message);
   }
-  res.status(200).json(JSON.stringify({ message: "successful" }));
-}
+
+  // Else, return success
+  res.status(200);
+};

@@ -1,15 +1,17 @@
-import { canDelegate, runMiddleware } from "helpers";
+import { canDelegate } from "helpers"; // canDelegate helper
 
-export default async function handler(req, res) {
-  // Runs CORS middleware
-  await runMiddleware(req, res);
+export default async (req, res) => {
+  const { address } = req.query; // Collect address from request
 
-  // Will revert on failure with error message and status code
   try {
-    await canDelegate(req.query.address);
-  } catch (err) {
-    res.status(err.code).json(JSON.stringify({ message: err.message }));
+    // Check if address can delegate
+    await canDelegate(address);
+  } catch (error) {
+    // If error, return response
+    res.status(error.code).send(error.message);
     return;
   }
-  res.status(200).json(JSON.stringify({ message: "successful" }));
-}
+
+  // Else return success
+  res.status(200);
+};
