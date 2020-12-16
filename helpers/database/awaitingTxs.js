@@ -12,7 +12,7 @@ const insertDelegateTx = async (tx) => {
   const { db } = await connectToDatabase();
 
   // Insert delegate transaction
-  const { insertedId } = await db.collection(collectionName).insertOne(tx);
+  const { insertedId } = await db.insertOne(tx);
 
   // Return insertionId
   return insertedId;
@@ -29,7 +29,6 @@ const delegationAllowed = async (address) => {
 
   // Check for existing transactions from user
   const existingUserTxs = await db
-    .collection(collectionName)
     .find({ from: address, type: "delegate", executed: false })
     .toArray();
 
@@ -44,7 +43,6 @@ const delegationAllowed = async (address) => {
 
   // Check for delegations in past week
   const delegationsInPastWeek = await db
-    .collection(collectionName)
     .find({
       createdAt: {
         $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000),
@@ -69,10 +67,10 @@ const delegationAllowed = async (address) => {
  */
 const insertVoteTx = async (tx) => {
   // Collect database connection
-  const { db } = await getDatabase();
+  const { db } = await connectToDatabase();
 
   // Insert vote
-  const { insertedId } = await db.collection(collectionName).insertOne(tx);
+  const { insertedId } = await db.insertOne(tx);
 
   // Return inserted vote id
   return insertedId;
@@ -86,11 +84,10 @@ const insertVoteTx = async (tx) => {
  */
 const voteAllowed = async (address, proposalId) => {
   // Collect database connection
-  const { db } = await getDatabase();
+  const { db } = await connectToDatabase();
 
   // Collect existing user transactions
   const existingUserTxs = await db
-    .collection(collectionName)
     .find({ from: address, proposalId: proposalId, type: "vote" })
     .toArray();
 
@@ -102,22 +99,10 @@ const voteAllowed = async (address, proposalId) => {
   }
 };
 
-/**
- * Returns all prending transactions from database
- */
-const getTxs = async () => {
-  // Collect database connection
-  const { db } = await getDatabase();
-
-  // Return pending transactions
-  return await db.collection(collectionName).find({}).toArray();
-};
-
 // Export functions
 export {
   insertDelegateTx,
   insertVoteTx,
-  getTxs,
   delegationAllowed,
   voteAllowed,
 };
