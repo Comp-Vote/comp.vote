@@ -106,7 +106,7 @@ export default function Layout({ children }) {
             </a>
             .
           </span>
-          <span>Community-led and built at heart.</span>
+          <span>Community-led and built with love.</span>
         </div>
       </div>
     </div>

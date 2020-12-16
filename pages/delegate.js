@@ -2,6 +2,7 @@ import axios from "axios"; // Requests wrapper
 import { useState } from "react"; // State management
 import { web3p } from "containers"; // Context
 import Layout from "components/layout"; // Layout wrapper
+import APICTA from "components/api_cta"; // API CTA
 import styles from "styles/page.module.scss"; // Page styles
 
 export default function Delegate({
@@ -186,6 +187,9 @@ export default function Delegate({
               <span>Delegates</span>
             </div>
           </div>
+
+          {/* Swagger API CTA card */}
+          <APICTA />
         </div>
       </div>
     </Layout>

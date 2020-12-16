@@ -2,6 +2,7 @@ import axios from "axios"; // Requests wrapper
 import dayjs from "dayjs"; // Dayjs
 import { useState } from "react"; // State management
 import Layout from "components/layout"; // Layout wrapper
+import APICTA from "components/api_cta"; // API CTA
 import { web3p, vote } from "containers"; // Context
 import styles from "styles/page.module.scss"; // Page styles
 
@@ -183,6 +184,9 @@ export default function Home({ defaultProposals, defaultPages }) {
             ) : null}
           </div>
         </div>
+
+        {/* Swagger API CTA card */}
+        <APICTA />
       </div>
     </Layout>
   );
