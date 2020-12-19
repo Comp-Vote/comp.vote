@@ -1,9 +1,9 @@
 import axios from "axios"; // Requests wrapper
 import { useState } from "react"; // State management
-import { web3p } from "containers"; // Context
 import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import styles from "styles/page.module.scss"; // Page styles
+import { web3p, delegate } from "containers"; // Context
 
 export default function Delegate({
   defaultAccounts,
@@ -14,9 +14,11 @@ export default function Delegate({
   const [pages, setPages] = useState(defaultPages); // Accounts pagination
   const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
   const [delegated] = useState(defaultDelegated); // Max delegated votes
+  const [customAddress, setCustomAddress] = useState("");
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
+  const { createDelegation } = delegate.useContainer();
 
   /**
    * Pagination handler
@@ -120,6 +122,10 @@ export default function Delegate({
                           delegate.display_name
                             ? // Show custom display name
                               delegate.display_name
+                            : // Else if delegate has associated crowd proposal
+                            delegate.crowd_proposal
+                            ? // Show associated crowd proposal title
+                              delegate.crowd_proposal.title
                             : // Else, show truncated address
                               delegate.address.substr(0, 4) +
                               "..." +
@@ -154,7 +160,9 @@ export default function Delegate({
                       <button
                         // If web3 ? delegate function : authenticate state
                         onClick={
-                          web3 ? () => console.log("Test") : authenticate
+                          web3
+                            ? () => createDelegation(delegate.address)
+                            : authenticate
                         }
                         className={styles.info}
                       >
@@ -184,7 +192,29 @@ export default function Delegate({
               <h4>Custom Address</h4>
             </div>
             <div>
-              <span>Delegates</span>
+              <div className={styles.customDelegate}>
+                {web3 ? (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="0xac5720d6ee2d7872b88914c9c5fa9bf38e72faf6"
+                      value={customAddress}
+                      onChange={(e) => setCustomAddress(e.target.value)}
+                    />
+                    <button
+                      // Delegate to input address
+                      onClick={() => createDelegation(customAddress)}
+                      className={styles.info}
+                    >
+                      Delegate
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={authenticate} className={styles.info}>
+                    Authenticate
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
