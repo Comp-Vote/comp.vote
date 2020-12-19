@@ -22,5 +22,5 @@ export default async (req, res) => {
   }
 
   // Else, return success
-  res.status(200);
+  res.status(200).end();
 };

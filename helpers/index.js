@@ -219,7 +219,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   let sigAddress;
 
   try {
-    sigAddress = await Promise.all([
+    [sigAddress, ] = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
         .call()
@@ -299,7 +299,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   let sigAddress;
 
   try {
-    sigAddress = await Promise.all([
+    [sigAddress, ] = await Promise.all([
       sigRelayer.methods
         .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
         .call(),
