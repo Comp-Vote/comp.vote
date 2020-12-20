@@ -346,7 +346,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
-    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
   }
 };
 
