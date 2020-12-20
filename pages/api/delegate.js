@@ -7,7 +7,7 @@ export default async (req, res) => {
     // Send delegation
     await delegate(
       transaction.address,
-      transaction.delegate,
+      transaction.delegatee,
       transaction.nonce,
       transaction.expiry,
       transaction.v,
