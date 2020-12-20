@@ -23,11 +23,7 @@ export default function Layout({ children }) {
           property="og:description"
           content="Gas-less voting and delegation for Compound Finance governance. Sign and relay your transactions for free."
         />
-        <meta
-          property="og:image"
-          // TODO: Change before live
-          content="https://comp-vote.vercel.app/brand/meta.png"
-        />
+        <meta property="og:image" content="https://comp.vote/brand/meta.png" />
 
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
@@ -39,8 +35,7 @@ export default function Layout({ children }) {
         />
         <meta
           property="twitter:image"
-          // TODO: Change before live
-          content="https://comp-vote.vercel.app/brand/meta.png"
+          content="https://comp.vote/brand/meta.png"
         />
 
         {/* Favicon */}
