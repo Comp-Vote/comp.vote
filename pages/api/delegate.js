@@ -7,7 +7,7 @@ export default async (req, res) => {
     // Send delegation
     await delegate(
       transaction.address,
-      transaction.delegate,
+      transaction.delegatee,
       transaction.nonce,
       transaction.expiry,
       transaction.v,
@@ -23,5 +23,5 @@ export default async (req, res) => {
   }
 
   // Else, send success status
-  res.status(200);
+  res.status(200).end();
 };

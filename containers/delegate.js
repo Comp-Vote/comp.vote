@@ -75,11 +75,11 @@ function useDelegate() {
 
   /**
    * POSTS delegation to back-end
-   * @param {string} delegate address to delegate voting power to
+   * @param {string} delegatee address to delegate voting power to
    * @param {integer} nonce transaction nonce
    * @param {string} signedMsg from Web3
    */
-  const castDelegation = async (delegate, nonce, signedMsg) => {
+  const castDelegation = async (delegatee, nonce, signedMsg) => {
     // Collect r, s, v
     const r = "0x" + signedMsg.substring(2, 66);
     const s = "0x" + signedMsg.substring(66, 130);
@@ -93,7 +93,7 @@ function useDelegate() {
         s,
         v,
         expiry: 10e9,
-        delegate,
+        delegatee,
         nonce,
       })
       // If successful
@@ -112,7 +112,7 @@ function useDelegate() {
    * Create a delegation to delegatee
    * @param {string} delegate address to delegate voting power to
    */
-  const createDelegation = async (delegate) => {
+  const createDelegation = async (delegatee) => {
     // Compound (COMP) Governance token contract
     const compoundContract = new web3.eth.Contract(
       COMP_ABI,
@@ -123,11 +123,11 @@ function useDelegate() {
     const nonce = await compoundContract.methods.nonces(address).call();
 
     // Generate delegation message to sign
-    const msgParams = createDelegateBySigMessage(delegate, nonce);
+    const msgParams = createDelegateBySigMessage(delegatee, nonce);
     const signedMsg = await signDelegation(msgParams);
 
     // POST vote to server
-    await castDelegation(delegate, nonce, signedMsg);
+    await castDelegation(delegatee, nonce, signedMsg);
   };
 
   return {

@@ -88,11 +88,11 @@ const canDelegate = async (address, delegatee = "0x") => {
   }
 
   // Enforces a min COMP balance of 1
-  if (compBalance <= 1e18) {
-    const error = new Error("COMP balance too low");
-    error.code = 403;
-    throw error;
-  }
+  // if (compBalance <= 1e18) {
+  //   const error = new Error("COMP balance too low");
+  //   error.code = 403;
+  //   throw error;
+  // }
 
   // If delegatee is specified, must not match existing delegatee
   if (
@@ -219,7 +219,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   let sigAddress;
 
   try {
-    sigAddress = await Promise.all([
+    [sigAddress, ] = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
         .call()
@@ -251,11 +251,11 @@ const vote = async (address, proposalId, support, v, r, s) => {
 
   // Create new transactions
   const newTx = {
+    from: address,
     v,
     r,
     s,
     support,
-    from: address,
     type: "vote",
     createdAt: new Date(),
     executed: false,
@@ -299,7 +299,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   let sigAddress;
 
   try {
-    sigAddress = await Promise.all([
+    [sigAddress, ] = await Promise.all([
       sigRelayer.methods
         .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
         .call(),
@@ -330,6 +330,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   // Create transaction
   const newTx = {
     from: address,
+    delegatee,
     v,
     r,
     s,
@@ -345,7 +346,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
-    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig");
   }
 };
 
