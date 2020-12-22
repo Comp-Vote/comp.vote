@@ -18,7 +18,12 @@ export default function APICTA() {
           rel="noopener noreferrer"
         >
           <span>Documentation</span>
-          <img src="/brand/icn-arrow.svg" alt="Right Arrow" />
+          <img
+            src="/brand/icn-arrow.svg"
+            alt="Right Arrow"
+            width="17"
+            height="11"
+          />
         </a>
       </div>
 

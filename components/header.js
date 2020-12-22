@@ -43,7 +43,12 @@ export default function Header() {
         <div>
           <Link href="/">
             <a>
-              <img src="brand/compound-logo.svg" alt="Compound logo" />
+              <img
+                src="brand/compound-logo.svg"
+                alt="Compound logo"
+                height="30"
+                width="136"
+              />
             </a>
           </Link>
         </div>
