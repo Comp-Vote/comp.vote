@@ -66,7 +66,7 @@ const canDelegate = async (address, delegatee = "0x") => {
   let compBalance, currentDelegatee;
 
   try {
-    [compBalance, currentDelegatee] = await Promise.all([
+    [compBalance, currentDelegatee,] = await Promise.all([
       // Collect address COMP balance
       compToken.methods.balanceOf(address).call(),
       // Collect address delegated status
@@ -137,7 +137,7 @@ const canVote = async (address, proposalId) => {
   let currentBlock;
 
   try {
-    [proposal, receipt, currentBlock] = await Promise.all([
+    [proposal, receipt, currentBlock,] = await Promise.all([
       // Collect proposal data
       governanceAlpha.methods.proposals(proposalId).call(),
       // Collect proposal receipt
@@ -168,7 +168,7 @@ const canVote = async (address, proposalId) => {
   if (
     !(
       currentBlock > proposal.startBlock &&
-      proposal.currentBlock < proposal.endBlock - 5
+      currentBlock < (proposal.endBlock - 5)
     ) ||
     proposal.canceled
   ) {
@@ -219,12 +219,10 @@ const vote = async (address, proposalId, support, v, r, s) => {
   let sigAddress;
 
   try {
-    [sigAddress, ] = await Promise.all([
+    [sigAddress,] = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
-        .call()
-        .toString()
-        .toLowerCase(),
+        .call(),
       canVote(address, proposalId),
     ]);
   } catch (error) {
@@ -243,7 +241,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   sigAddress = sigAddress.toString().toLowerCase();
 
   // Address verified to create sig and alleged must match
-  if (address.localeCompare(sigAddress.toString().toLowerCase()) != 0) {
+  if (address.localeCompare(sigAddress) != 0) {
     const error = new Error("given address does not match signer address");
     error.code = 422;
     throw error;
@@ -256,6 +254,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     r,
     s,
     support,
+    proposalId,
     type: "vote",
     createdAt: new Date(),
     executed: false,
@@ -266,7 +265,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
-    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
   }
 };
 
@@ -299,7 +298,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   let sigAddress;
 
   try {
-    [sigAddress, ] = await Promise.all([
+    [sigAddress,] = await Promise.all([
       sigRelayer.methods
         .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
         .call(),
