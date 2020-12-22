@@ -80,7 +80,7 @@ function useVote() {
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
-    await castVote(proposalId, false, signedMsg);
+    await castVote(proposalId, true, signedMsg);
   };
 
   /**

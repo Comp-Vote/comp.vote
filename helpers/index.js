@@ -222,9 +222,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     [sigAddress,] = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
-        .call()
-        .toString()
-        .toLowerCase(),
+        .call(),
       canVote(address, proposalId),
     ]);
   } catch (error) {
@@ -243,7 +241,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   sigAddress = sigAddress.toString().toLowerCase();
 
   // Address verified to create sig and alleged must match
-  if (address.localeCompare(sigAddress.toString().toLowerCase()) != 0) {
+  if (address.localeCompare(sigAddress) != 0) {
     const error = new Error("given address does not match signer address");
     error.code = 422;
     throw error;
@@ -299,7 +297,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   let sigAddress;
 
   try {
-    [sigAddress, ] = await Promise.all([
+    [sigAddress,] = await Promise.all([
       sigRelayer.methods
         .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
         .call(),
