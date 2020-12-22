@@ -66,7 +66,7 @@ const canDelegate = async (address, delegatee = "0x") => {
   let compBalance, currentDelegatee;
 
   try {
-    [compBalance, currentDelegatee] = await Promise.all([
+    [compBalance, currentDelegatee,] = await Promise.all([
       // Collect address COMP balance
       compToken.methods.balanceOf(address).call(),
       // Collect address delegated status
@@ -137,7 +137,7 @@ const canVote = async (address, proposalId) => {
   let currentBlock;
 
   try {
-    [proposal, receipt, currentBlock] = await Promise.all([
+    [proposal, receipt, currentBlock,] = await Promise.all([
       // Collect proposal data
       governanceAlpha.methods.proposals(proposalId).call(),
       // Collect proposal receipt
@@ -168,7 +168,7 @@ const canVote = async (address, proposalId) => {
   if (
     !(
       currentBlock > proposal.startBlock &&
-      proposal.currentBlock < proposal.endBlock - 5
+      currentBlock < (proposal.endBlock - 5)
     ) ||
     proposal.canceled
   ) {
@@ -219,7 +219,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   let sigAddress;
 
   try {
-    [sigAddress, ] = await Promise.all([
+    [sigAddress,] = await Promise.all([
       sigRelayer.methods
         .signatoryFromVoteSig(proposalId, support, v, r, s)
         .call()
@@ -266,7 +266,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
-    axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
   }
 };
 
