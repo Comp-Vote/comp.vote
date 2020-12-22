@@ -102,6 +102,9 @@ export default function Layout({ children }) {
             .
           </span>
           <span>Community-led and built with love.</span>
+          <span>
+            Need support? <a href="mailto:help@comp.vote">help@comp.vote</a>
+          </span>
         </div>
       </div>
     </div>

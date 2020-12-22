@@ -167,10 +167,15 @@
   border-bottom: 1px solid #00d395;
 }
 
+// Content
+.content {
+  background-color: rgb(249, 250, 251);
+}
+
 // Footer
 .footer {
   background-color: #070a0e;
-  height: 150px;
+  height: 185px;
 
   > div {
     max-width: 1100px;
@@ -180,7 +185,7 @@
     text-align: center;
 
     span:nth-of-type(1) {
-      padding-top: 50px;
+      padding-top: 40px;
     }
 
     span {
