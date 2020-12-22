@@ -88,7 +88,7 @@ const canDelegate = async (address, delegatee = "0x") => {
   }
 
   // Enforces a min COMP balance
-  if (compBalance <= process.env.MIN_COMP) {
+  if (compBalance < process.env.MIN_COMP) {
     const error = new Error("COMP balance too low");
     error.code = 403;
     throw error;
@@ -179,7 +179,7 @@ const canVote = async (address, proposalId) => {
 
   // Require at least min comp COMP delegated
   if (votesDelegated < process.env.MIN_COMP) {
-    const error = new Error("must have at least 1 COMP delegated");
+    const error = new Error("COMP delegated to address is too low");
     error.code = 403;
     throw error;
   }
