@@ -10,7 +10,7 @@ const providerOptions = {
     package: WalletConnectProvider,
     options: {
       // Inject Infura
-      infuraId: process.env.NEXT_PUBLIC_INFURA_RPC,
+      infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
     },
   },
 };
