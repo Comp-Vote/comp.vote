@@ -89,7 +89,7 @@ function useDelegate() {
     const v = "0x" + signedMsg.substring(130, 132);
 
     // Post to back-end
-    axios
+    await axios
       .post("/api/delegate", {
         address,
         r,
