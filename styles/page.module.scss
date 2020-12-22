@@ -114,12 +114,12 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   border-left: 2px solid transparent;
 
-  div {
+  > div {
     display: inline-block;
     height: 100%;
   }
 
-  div:nth-child(2) {
+  > div:nth-child(2) {
     float: right;
 
     button {
@@ -134,6 +134,10 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: bold;
+
+      > div {
+        transform: translateY(2px);
+      }
     }
 
     button:focus {
@@ -284,19 +288,35 @@
 .for {
   border-color: #00d395;
   color: #00d395;
+
+  > div > div {
+    background-color: #00d395;
+  }
 }
 
 .for:hover {
   background-color: #00d395 !important;
+
+  > div > div {
+    background-color: #fff;
+  }
 }
 
 .against {
   border-color: rgb(214, 2, 44);
   color: rgb(214, 2, 44);
+
+  > div > div {
+    background-color: rgb(214, 2, 44);
+  }
 }
 
 .against:hover {
   background-color: rgb(214, 2, 44) !important;
+
+  > div > div {
+    background-color: #fff;
+  }
 }
 
 // Custom delegation card

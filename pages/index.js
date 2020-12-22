@@ -5,11 +5,13 @@ import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import { web3p, vote } from "containers"; // Context
 import styles from "styles/page.module.scss"; // Page styles
+import BeatLoader from "react-spinners/BeatLoader"; // Loading state
 
 export default function Home({ defaultProposals, defaultPages }) {
   const [loading, setLoading] = useState(false); // Proposal loading state
   const [pages, setPages] = useState(defaultPages); // Proposal pagination
   const [proposals, setProposals] = useState(defaultProposals); // Proposals array
+  const [buttonLoading, setButtonLoading] = useState({ id: null, type: null }); // Current button loading state
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
@@ -64,6 +66,27 @@ export default function Home({ defaultProposals, defaultPages }) {
       // In new tab
       "_blank"
     );
+  };
+
+  /**
+   * voteFor or voteAgainst with loading states
+   * @param {*} proposalId to vote for or against
+   * @param {*} type 0 === voteFor, 1 === voteAgainst
+   */
+  const voteWithLoading = async (proposalId, type) => {
+    // Toggle button loading to true
+    setButtonLoading({ id: proposalId, type: type });
+
+    try {
+      // Call voteFor or voteAgainst based on type
+      type === 0 ? await voteFor(proposalId) : await voteAgainst(proposalId);
+    } catch {
+      // If MetaMask cancellation, toggle button loading to false
+      setButtonLoading({ id: null, type: null });
+    }
+
+    // Else, toggle loading to false on success
+    setButtonLoading({ id: null, type: null });
   };
 
   return (
@@ -143,16 +166,26 @@ export default function Home({ defaultProposals, defaultPages }) {
                           // If authenticated and proposal active, return voting + info buttons
                           <>
                             <button
-                              onClick={() => voteFor(proposal.id)}
+                              onClick={() => voteWithLoading(proposal.id, 0)}
                               className={styles.for}
                             >
-                              Vote For
+                              {buttonLoading.id === proposal.id &&
+                              buttonLoading.type === 0 ? (
+                                <BeatLoader size={9} />
+                              ) : (
+                                "Vote For"
+                              )}
                             </button>
                             <button
-                              onClick={() => voteAgainst(proposal.id)}
+                              onClick={() => voteWithLoading(proposal.id, 1)}
                               className={styles.against}
                             >
-                              Vote Against
+                              {buttonLoading.id === proposal.id &&
+                              buttonLoading.type === 1 ? (
+                                <BeatLoader size={9} />
+                              ) : (
+                                "Vote Against"
+                              )}
                             </button>
                           </>
                         ) : (

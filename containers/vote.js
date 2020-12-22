@@ -50,8 +50,7 @@ function useVote() {
    * @param {string} msgParams to sign
    */
   const signVote = async (msgParams) => {
-    // Return promise
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       // Sign message
       web3.currentProvider.sendAsync(
         {
@@ -64,6 +63,9 @@ function useVote() {
           if (!error) {
             // Resolve promise with resulting signature
             resolve(result.result);
+          } else {
+            // Reject promise with resulting error
+            reject(error);
           }
         }
       );
