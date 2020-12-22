@@ -254,6 +254,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     r,
     s,
     support,
+    proposalId,
     type: "vote",
     createdAt: new Date(),
     executed: false,
