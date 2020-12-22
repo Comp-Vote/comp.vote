@@ -70,8 +70,8 @@ export default function Home({ defaultProposals, defaultPages }) {
 
   /**
    * voteFor or voteAgainst with loading states
-   * @param {*} proposalId to vote for or against
-   * @param {*} type 0 === voteFor, 1 === voteAgainst
+   * @param {number} proposalId to vote for or against
+   * @param {number} type 0 === voteFor, 1 === voteAgainst
    */
   const voteWithLoading = async (proposalId, type) => {
     // Toggle button loading to true

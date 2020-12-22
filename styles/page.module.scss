@@ -195,7 +195,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   border-left: 2px solid transparent;
 
-  div {
+  > div {
     display: inline-block;
     vertical-align: middle;
     height: 100%;
@@ -223,6 +223,11 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: bold;
+      min-width: 100px;
+
+      > div {
+        transform: translateY(2px);
+      }
     }
 
     button:focus {
@@ -234,7 +239,7 @@
     }
   }
 
-  div:nth-child(1) {
+  > div:nth-child(1) {
     width: 30px;
 
     span {
@@ -243,7 +248,7 @@
     }
   }
 
-  div:nth-child(2) {
+  > div:nth-child(2) {
     width: 50px;
 
     img {
@@ -251,21 +256,21 @@
     }
   }
 
-  div:nth-child(3) {
+  > div:nth-child(3) {
     width: calc(100% - 500px);
   }
 
-  div:nth-child(4) {
+  > div:nth-child(4) {
     width: 120px;
   }
 
-  div:nth-child(5) {
+  > div:nth-child(5) {
     width: 80px;
     padding-right: 20px;
     text-align: right;
   }
 
-  div:nth-child(6) {
+  > div:nth-child(6) {
     width: 200px;
     text-align: right;
   }
@@ -279,10 +284,18 @@
 .info {
   border-color: #657786;
   color: #657786;
+
+  > div > div {
+    background-color: #657786;
+  }
 }
 
 .info:hover {
   background-color: #657786 !important;
+
+  > div > div {
+    background-color: #fff;
+  }
 }
 
 .for {
@@ -483,7 +496,7 @@
   }
 
   .delegate {
-    div {
+    > div {
       font-size: 0.875rem;
 
       img {
@@ -492,20 +505,20 @@
       }
     }
 
-    div:nth-child(2) {
+    > div:nth-child(2) {
       width: 35px;
     }
 
-    div:nth-child(3) {
+    > div:nth-child(3) {
       width: 105px;
     }
 
-    div:nth-child(4),
-    div:nth-child(5) {
+    > div:nth-child(4),
+    > div:nth-child(5) {
       display: none;
     }
 
-    div:nth-child(6) {
+    > div:nth-child(6) {
       width: calc(100% - 170px);
 
       button {

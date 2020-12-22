@@ -54,7 +54,7 @@ function useDelegate() {
    */
   const signDelegation = async (msgParams) => {
     // Return promise
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       // Sign message
       web3.currentProvider.sendAsync(
         {
@@ -67,6 +67,9 @@ function useDelegate() {
           if (!error) {
             // Resolve promise with resulting signature
             resolve(result.result);
+          } else {
+            // Reject promise with resulting error
+            reject(error);
           }
         }
       );

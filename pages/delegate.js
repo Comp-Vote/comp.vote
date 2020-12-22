@@ -4,6 +4,7 @@ import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import styles from "styles/page.module.scss"; // Page styles
 import { web3p, delegate } from "containers"; // Context
+import BeatLoader from "react-spinners/BeatLoader"; // Loading state
 
 export default function Delegate({
   defaultAccounts,
@@ -11,10 +12,11 @@ export default function Delegate({
   defaultDelegated,
 }) {
   const [loading, setLoading] = useState(false); // Accounts loading state
-  const [pages, setPages] = useState(defaultPages); // Accounts pagination
-  const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
   const [delegated] = useState(defaultDelegated); // Max delegated votes
-  const [customAddress, setCustomAddress] = useState("");
+  const [pages, setPages] = useState(defaultPages); // Accounts pagination
+  const [customAddress, setCustomAddress] = useState(""); // Custom voting address
+  const [buttonLoading, setButtonLoading] = useState(null); // Delegation button loading state
+  const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
@@ -47,6 +49,27 @@ export default function Delegate({
 
     // Toggle loading state
     setLoading(false);
+  };
+
+  /**
+   * createDelegation with button loading state
+   * @param {string} address to delegate to
+   * @param {number} rank 0 === custom delegation, else rank === address rank in table
+   */
+  const createDelegationWithLoading = async (address, rank) => {
+    // Toggle button loading to true
+    setButtonLoading(rank);
+
+    try {
+      // Call createDelegation
+      await createDelegation(address);
+    } catch {
+      // If MetaMask cancellation, force toggle loading to false
+      setButtonLoading(null);
+    }
+
+    // Else, toggle loading to false on success
+    setButtonLoading(null);
   };
 
   return (
@@ -161,12 +184,24 @@ export default function Delegate({
                         // If web3 ? delegate function : authenticate state
                         onClick={
                           web3
-                            ? () => createDelegation(delegate.address)
+                            ? () =>
+                                createDelegationWithLoading(
+                                  delegate.address,
+                                  delegate.rank
+                                )
                             : authenticate
                         }
                         className={styles.info}
                       >
-                        {web3 ? "Delegate" : "Authenticate"}
+                        {web3 ? (
+                          buttonLoading === delegate.rank ? (
+                            <BeatLoader size={9} />
+                          ) : (
+                            "Delegate"
+                          )
+                        ) : (
+                          "Authenticate"
+                        )}
                       </button>
                     </div>
                   </div>
@@ -203,10 +238,16 @@ export default function Delegate({
                     />
                     <button
                       // Delegate to input address
-                      onClick={() => createDelegation(customAddress)}
+                      onClick={() =>
+                        createDelegationWithLoading(customAddress, 0)
+                      }
                       className={styles.info}
                     >
-                      Delegate
+                      {buttonLoading === 0 ? (
+                        <BeatLoader size={9} />
+                      ) : (
+                        "Delegate"
+                      )}
                     </button>
                   </>
                 ) : (
