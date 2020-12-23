@@ -49,7 +49,11 @@ const Web3Handler = () => {
  */
 const canDelegate = async (address, delegatee = "0x") => {
   // Collect COMP token contract
-  const { compToken } = Web3Handler();
+  const { web3, compToken } = Web3Handler();
+
+  // Delegatee and address formatting
+  delegatee = delegatee.toString().toLowerCase();
+  address = address.toString().toLowerCase();
 
   // Check for address
   if (address === undefined) {
@@ -58,8 +62,22 @@ const canDelegate = async (address, delegatee = "0x") => {
     throw error;
   }
 
-  // Force address to string + lowercase
-  address = address.toString().toLowerCase();
+  if (delegatee != "0x") {
+  	// Address set, must be valid
+  	if(!web3.utils.isAddress(delegatee)) {
+  		// Invalid address
+  		const newError = new Error("invalid delegatee address");
+  		newError.code = 422;
+  		throw newError;
+  	}
+  }
+
+  if(!web3.utils.isAddress(address)) {
+  	const newError = new Error("invalid from address");
+  	newError.code = 422;
+  	throw newError;
+  }
+
 
   // Gets the address onchain COMP balance, current address
   // delegated to and checks if database for delegationAllowed
@@ -88,7 +106,7 @@ const canDelegate = async (address, delegatee = "0x") => {
   }
 
   // Enforces a min COMP balance
-  if (compBalance < process.env.MIN_COMP) {
+  if (parseInt(compBalance) < parseInt(process.env.MIN_COMP)) {
     const error = new Error("COMP balance too low");
     error.code = 403;
     throw error;
@@ -98,8 +116,6 @@ const canDelegate = async (address, delegatee = "0x") => {
   if (
     delegatee != "0x" &&
     delegatee
-      .toString()
-      .toLowerCase()
       .localeCompare(currentDelegatee.toString().toLowerCase()) == 0
   ) {
     const error = new Error("delegatee can not be current delegatee");
@@ -126,6 +142,12 @@ const canVote = async (address, proposalId) => {
 
   // Force address formatting
   address = address.toString().toLowerCase();
+
+  if(!web3.utils.isAddress(address)) {
+  	const newError = new Error("invalid from address");
+  	newError.code = 422;
+  	throw newError;
+  }
 
   // On chain proposal data
   let proposal;
@@ -178,7 +200,7 @@ const canVote = async (address, proposalId) => {
   }
 
   // Require at least min comp COMP delegated
-  if (votesDelegated < process.env.MIN_COMP) {
+  if (parseInt(votesDelegated) < parseInt(process.env.MIN_COMP)) {
     const error = new Error("COMP delegated to address is too low");
     error.code = 403;
     throw error;
