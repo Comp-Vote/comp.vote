@@ -63,21 +63,20 @@ const canDelegate = async (address, delegatee = "0x") => {
   }
 
   if (delegatee != "0x") {
-  	// Address set, must be valid
-  	if(!web3.utils.isAddress(delegatee)) {
-  		// Invalid address
-  		const newError = new Error("invalid delegatee address");
-  		newError.code = 422;
-  		throw newError;
-  	}
+    // Address set, must be valid
+    if (!web3.utils.isAddress(delegatee)) {
+      // Invalid address
+      const newError = new Error("invalid delegatee address");
+      newError.code = 422;
+      throw newError;
+    }
   }
 
-  if(!web3.utils.isAddress(address)) {
-  	const newError = new Error("invalid from address");
-  	newError.code = 422;
-  	throw newError;
+  if (!web3.utils.isAddress(address)) {
+    const newError = new Error("invalid from address");
+    newError.code = 422;
+    throw newError;
   }
-
 
   // Gets the address onchain COMP balance, current address
   // delegated to and checks if database for delegationAllowed
@@ -115,8 +114,7 @@ const canDelegate = async (address, delegatee = "0x") => {
   // If delegatee is specified, must not match existing delegatee
   if (
     delegatee != "0x" &&
-    delegatee
-      .localeCompare(currentDelegatee.toString().toLowerCase()) == 0
+    delegatee.localeCompare(currentDelegatee.toString().toLowerCase()) == 0
   ) {
     const error = new Error("delegatee can not be current delegatee");
     error.code = 403;
@@ -143,10 +141,10 @@ const canVote = async (address, proposalId) => {
   // Force address formatting
   address = address.toString().toLowerCase();
 
-  if(!web3.utils.isAddress(address)) {
-  	const newError = new Error("invalid from address");
-  	newError.code = 422;
-  	throw newError;
+  if (!web3.utils.isAddress(address)) {
+    const newError = new Error("invalid from address");
+    newError.code = 422;
+    throw newError;
   }
 
   // On chain proposal data
