@@ -188,7 +188,7 @@ const canVote = async (address, proposalId) => {
   if (
     !(
       currentBlock > proposal.startBlock &&
-      currentBlock < proposal.endBlock - 80
+      currentBlock < proposal.endBlock - 2400
     ) ||
     proposal.canceled
   ) {
