@@ -68,6 +68,15 @@ function useWeb3() {
     setWeb3(null);
   };
 
+  /**
+   * Checks validity of Ethereum address
+   * @param {String} address to check
+   * @returns {Boolean} true if address is valid
+   */
+  const isValidAddress = (address) => {
+    return web3.utils.isAddress(address);
+  };
+
   // On mount
   useEffect(() => {
     // Setup web3modal
@@ -79,6 +88,7 @@ function useWeb3() {
     address,
     authenticate,
     unauthenticate,
+    isValidAddress,
   };
 }
 

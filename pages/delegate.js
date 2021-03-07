@@ -19,7 +19,7 @@ export default function Delegate({
   const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
 
   // Web3 + Authenticate function from context
-  const { web3, authenticate } = web3p.useContainer();
+  const { web3, authenticate, isValidAddress } = web3p.useContainer();
   const { createDelegation } = delegate.useContainer();
 
   /**
@@ -236,19 +236,25 @@ export default function Delegate({
                       value={customAddress}
                       onChange={(e) => setCustomAddress(e.target.value)}
                     />
-                    <button
-                      // Delegate to input address
-                      onClick={() =>
-                        createDelegationWithLoading(customAddress, 0)
-                      }
-                      className={styles.info}
-                    >
-                      {buttonLoading === 0 ? (
-                        <BeatLoader size={9} />
-                      ) : (
-                        "Delegate"
-                      )}
-                    </button>
+                    {isValidAddress(customAddress) ? (
+                      // If enterred address is valid, display delegation button
+                      <button
+                        // Delegate to input address
+                        onClick={() =>
+                          createDelegationWithLoading(customAddress, 0)
+                        }
+                        className={styles.info}
+                      >
+                        {buttonLoading === 0 ? (
+                          <BeatLoader size={9} />
+                        ) : (
+                          "Delegate"
+                        )}
+                      </button>
+                    ) : (
+                      // Else, display invalid address button
+                      <button disabled>Invalid Address</button>
+                    )}
                   </>
                 ) : (
                   <button onClick={authenticate} className={styles.info}>
