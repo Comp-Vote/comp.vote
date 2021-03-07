@@ -19,7 +19,7 @@ export default function Delegate({
   const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
 
   // Web3 + Authenticate function from context
-  const { web3, authenticate, isValidAddress } = web3p.useContainer();
+  const { web3, address, authenticate, isValidAddress } = web3p.useContainer();
   const { createDelegation } = delegate.useContainer();
 
   /**
@@ -255,6 +255,18 @@ export default function Delegate({
                       // Else, display invalid address button
                       <button disabled>Invalid Address</button>
                     )}
+
+                    {/* Self delegation */}
+                    <button
+                      onClick={() => createDelegationWithLoading(address, -1)}
+                      className={styles.info}
+                    >
+                      {buttonLoading === -1 ? (
+                        <BeatLoader size={9} />
+                      ) : (
+                        "Self-delegate"
+                      )}
+                    </button>
                   </>
                 ) : (
                   <button onClick={authenticate} className={styles.info}>
