@@ -1,12 +1,16 @@
 import axios from "axios"; // Axios requests
 import { web3p } from "containers"; // Web3
 import { COMP_ABI } from "helpers/abi"; // Compound (COMP) Governance Token ABI
+import { useState, useEffect } from "react"; // State management
 import { createContainer } from "unstated-next"; // Unstated-next containerization
 
 // Reference implementation: https://github.com/TennisBowling/comp.vote/blob/master/bySig/delegate_by_signature.html
 function useDelegate() {
   // Context
   const { web3, address } = web3p.useContainer();
+
+  // Local state
+  const [currentDelegate, setCurrentDelegate] = useState(null); // Current delegate
 
   /**
    * Generate delegation message
@@ -133,7 +137,38 @@ function useDelegate() {
     await castDelegation(delegatee, nonce, signedMsg);
   };
 
+  /**
+   * Checks if a user has an existing delegation
+   */
+  const checkDelegation = async () => {
+    // Compound (COMP) Governance token contract
+    const compoundContract = new web3.eth.Contract(
+      COMP_ABI,
+      "0xc00e94cb662c3520282e6f5717214004a7f26888"
+    );
+
+    // Collect current delegate
+    const delegate = await compoundContract.methods.delegates(address).call();
+
+    // Update delegate in state
+    const noDelegate = "0x0000000000000000000000000000000000000000";
+    if (delegate !== noDelegate) setCurrentDelegate(delegate);
+  };
+
+  // --> On address change (lock/unlock)
+  useEffect(() => {
+    // Set current delegate to null
+    setCurrentDelegate(null);
+
+    // If authenticated
+    if (web3 && address) {
+      // Recheck delegation status
+      checkDelegation();
+    }
+  }, [address]);
+
   return {
+    currentDelegate,
     createDelegation,
   };
 }

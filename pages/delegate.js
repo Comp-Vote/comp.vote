@@ -20,7 +20,7 @@ export default function Delegate({
 
   // Web3 + Authenticate function from context
   const { web3, address, authenticate, isValidAddress } = web3p.useContainer();
-  const { createDelegation } = delegate.useContainer();
+  const { currentDelegate, createDelegation } = delegate.useContainer();
 
   /**
    * Pagination handler
@@ -86,6 +86,27 @@ export default function Delegate({
               fees.
             </p>
           </div>
+
+          {/* Current delegation status if delegated */}
+          {currentDelegate ? (
+            // If delegated, display information
+            <div>
+              <h2>
+                <a
+                  // Link to Compound Governance profile
+                  href={`https://compound.finance/governance/address/${currentDelegate}?target_network=mainnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {currentDelegate.substr(0, 5) +
+                    // Address of delegate
+                    "..." +
+                    currentDelegate.slice(currentDelegate.length - 5)}
+                </a>
+              </h2>
+              <h3>Delegating To</h3>
+            </div>
+          ) : null}
         </div>
       </div>
 
