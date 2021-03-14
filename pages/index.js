@@ -168,7 +168,7 @@ export default function Home({ defaultProposals, defaultPages }) {
                       >
                         Info
                       </button>
-                      {proposal.states[proposal.states.length - 1].state !==
+                      {proposal.states[proposal.states.length - 1].state ===
                       "active" ? (
                         // Check if proposal is active
                         web3 ? (
