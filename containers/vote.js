@@ -22,7 +22,7 @@ function useVote() {
       ],
       Ballot: [
         { name: "proposalId", type: "uint256" },
-        { name: "support", type: "bool" },
+        { name: "support", type: "uint8" },
       ],
     };
 
@@ -32,9 +32,9 @@ function useVote() {
       primaryType: "Ballot",
       // Compound Governor contract
       domain: {
-        name: "Compound Governor Alpha",
-        chainId: 1,
-        verifyingContract: "0xc0da01a04c3f3e0be433606045bb7017a7323e38",
+        name: "Compound Governor Bravo",
+        chainId: 42,
+        verifyingContract: "0x100044c436dfb66ff106157970bc89f243411ffd",
       },
       // Message
       message: {
@@ -78,11 +78,11 @@ function useVote() {
    */
   const voteFor = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, true);
+    const msgParams = createVoteBySigMessage(proposalId, 1);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
-    await castVote(proposalId, true, signedMsg);
+    await castVote(proposalId, 1, signedMsg);
   };
 
   /**
@@ -91,11 +91,11 @@ function useVote() {
    */
   const voteAgainst = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, false);
+    const msgParams = createVoteBySigMessage(proposalId, 0);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
-    await castVote(proposalId, false, signedMsg);
+    await castVote(proposalId, 0, signedMsg);
   };
 
   /**

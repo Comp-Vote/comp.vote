@@ -4,9 +4,9 @@ import SIG_RELAYER_ABI from "helpers/abi/SigRelayer.abi";
 import GOVERNER_ALPHA_ABI from "helpers/abi/GovernorAlpha.abi";
 
 // Mainnet contract addresses
-const SIG_RELAYER_ADDRESS = "0xf61d8eef3f479dfa24beaa46bf6f235e6e2f7af8";
-const COMP_ADDRESS = "0xc00e94cb662c3520282e6f5717214004a7f26888";
-const GOVERNANCE_ADDRESS = "0xc0da01a04c3f3e0be433606045bb7017a7323e38";
+const SIG_RELAYER_ADDRESS = "0x6E3e70d0e2268eE7a7975589f67A0e5C607e48Ea";
+const COMP_ADDRESS = "0x61460874a7196d6a22d1ee4922473664b3e95270";
+const GOVERNANCE_ADDRESS = "0x100044c436dfb66ff106157970bc89f243411ffd";
 
 // Export as individual exports
 export {
