@@ -15,7 +15,7 @@ export default function Home({ defaultProposals, defaultPages }) {
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
-  const { voteFor, voteAgainst } = vote.useContainer();
+  const { voteFor, voteAgainst, abstain } = vote.useContainer();
 
   /**
    * Util: Uppercase first letter of word
@@ -69,17 +69,26 @@ export default function Home({ defaultProposals, defaultPages }) {
   };
 
   /**
-   * voteFor or voteAgainst with loading states
-   * @param {number} proposalId to vote for or against
-   * @param {number} type 0 === voteFor, 1 === voteAgainst
+   * voteFor, voteAgainst, or abstain with loading states
+   * @param {number} proposalId to cast a vote on
+   * @param {number} type 0 === voteFor, 1 === voteAgainst, 2 === abstain
    */
   const voteWithLoading = async (proposalId, type) => {
     // Toggle button loading to true
     setButtonLoading({ id: proposalId, type: type });
-
+    console.log(type);
     try {
       // Call voteFor or voteAgainst based on type
-      type === 0 ? await voteFor(proposalId) : await voteAgainst(proposalId);
+      switch(Number(type)) {
+      	case 0:
+      		await voteFor(proposalId);
+      		break;
+      	case 1:
+      		await voteAgainst(proposalId);
+      		break;
+      	default:
+      		await abstain(proposalId);
+      }
     } catch {
       // If MetaMask cancellation, toggle button loading to false
       setButtonLoading({ id: null, type: null });
@@ -159,7 +168,7 @@ export default function Home({ defaultProposals, defaultPages }) {
                       >
                         Info
                       </button>
-                      {proposal.states[proposal.states.length - 1].state ===
+                      {proposal.states[proposal.states.length - 1].state !==
                       "active" ? (
                         // Check if proposal is active
                         web3 ? (
@@ -185,6 +194,17 @@ export default function Home({ defaultProposals, defaultPages }) {
                                 <BeatLoader size={9} />
                               ) : (
                                 "Vote Against"
+                              )}
+                            </button>
+                            <button
+                              onClick={() => voteWithLoading(proposal.id, 2)}
+                              className={styles.abstain}
+                            >
+                              {buttonLoading.id === proposal.id &&
+                              buttonLoading.type === 2 ? (
+                                <BeatLoader size={9} />
+                              ) : (
+                                "Abstain"
                               )}
                             </button>
                           </>

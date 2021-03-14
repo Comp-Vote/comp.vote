@@ -232,6 +232,12 @@ const vote = async (address, proposalId, support, v, r, s) => {
     throw error;
   }
 
+  if(support > 2) {
+    const error = new Error("invalid support value");
+    error.code = 422;
+    throw error;
+  }
+
   // Force address formatting
   address = address.toString().toLowerCase();
 

@@ -39,8 +39,7 @@ function useVote() {
       // Message
       message: {
         proposalId,
-        // Enforce true || false
-        support: !!support,
+        support: support,
       },
     });
   };
@@ -99,6 +98,19 @@ function useVote() {
   };
 
   /**
+   * Generate an ABSTAIN vote for the proposalId
+   * @param {Number} proposalId of compund governance proposal
+   */
+  const abstain = async (proposalId) => {
+    // Generate and sign message
+    const msgParams = createVoteBySigMessage(proposalId, 2);
+    const signedMsg = await signVote(msgParams);
+
+    // POST vote to server
+    await castVote(proposalId, 2, signedMsg);
+  };
+
+  /**
    * POSTS vote to back-end
    * @param {Number} proposalId of compound governance proposal
    * @param {boolean} support indicating for || against status for proposal
@@ -135,6 +147,7 @@ function useVote() {
   return {
     voteFor,
     voteAgainst,
+    abstain
   };
 }
 
