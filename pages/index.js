@@ -34,7 +34,7 @@ export default function Home({ defaultProposals, defaultPages }) {
     setLoading(true);
 
     // Collect next page request string and request
-    const nextPage = `https://api.compound.finance/api/v2/governance/proposals?page_number=${
+    const nextPage = `https://api.compound.finance/api/v2/governance/proposals?network=kovan&page_number=${
       pages.current + 1
     }`;
     const response = await axios.get(nextPage);
