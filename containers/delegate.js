@@ -39,8 +39,8 @@ function useDelegate() {
       // Compound COMP token contract
       domain: {
         name: "Compound",
-        chainId: 42,
-        verifyingContract: "0x61460874a7196d6a22d1ee4922473664b3e95270",
+        chainId: 1,
+        verifyingContract: "0xc00e94cb662c3520282e6f5717214004a7f26888",
       },
       // Message
       message: {
@@ -123,7 +123,7 @@ function useDelegate() {
     // Compound (COMP) Governance token contract
     const compoundContract = new web3.eth.Contract(
       COMP_ABI,
-      "0x61460874a7196d6a22d1ee4922473664b3e95270"
+      "0xc00e94cb662c3520282e6f5717214004a7f26888"
     );
 
     // Collect interaction nonce
@@ -144,7 +144,7 @@ function useDelegate() {
     // Compound (COMP) Governance token contract
     const compoundContract = new web3.eth.Contract(
       COMP_ABI,
-      "0x61460874a7196d6a22d1ee4922473664b3e95270"
+      "0xc00e94cb662c3520282e6f5717214004a7f26888"
     );
 
     // Collect current delegate

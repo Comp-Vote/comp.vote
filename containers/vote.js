@@ -33,8 +33,8 @@ function useVote() {
       // Compound Governor contract
       domain: {
         name: "Compound Governor Bravo",
-        chainId: 42,
-        verifyingContract: "0x100044c436dfb66ff106157970bc89f243411ffd",
+        chainId: 1,
+        verifyingContract: "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
       },
       // Message
       message: {
@@ -101,7 +101,7 @@ function useVote() {
    * Generate an ABSTAIN vote for the proposalId
    * @param {Number} proposalId of compund governance proposal
    */
-  const abstain = async (proposalId) => {
+  const voteAbstain = async (proposalId) => {
     // Generate and sign message
     const msgParams = createVoteBySigMessage(proposalId, 2);
     const signedMsg = await signVote(msgParams);
@@ -147,7 +147,7 @@ function useVote() {
   return {
     voteFor,
     voteAgainst,
-    abstain
+    voteAbstain
   };
 }
 
