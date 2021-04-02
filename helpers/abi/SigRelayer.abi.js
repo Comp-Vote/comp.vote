@@ -92,24 +92,59 @@ const SIG_RELAYER_ABI = [
           { internalType: "bytes32", name: "r", type: "bytes32" },
           { internalType: "bytes32", name: "s", type: "bytes32" },
         ],
-        internalType: "struct SigRelayer.DelegationSig[]",
+        internalType: "struct SigRelayer2.DelegationSig[]",
         name: "s1",
         type: "tuple[]",
       },
       {
         components: [
           { internalType: "uint256", name: "proposalId", type: "uint256" },
-          { internalType: "bool", name: "support", type: "bool" },
+          { internalType: "uint8", name: "support", type: "uint8" },
           { internalType: "uint8", name: "v", type: "uint8" },
           { internalType: "bytes32", name: "r", type: "bytes32" },
           { internalType: "bytes32", name: "s", type: "bytes32" },
         ],
-        internalType: "struct SigRelayer.VoteSig[]",
+        internalType: "struct SigRelayer2.VoteSig[]",
         name: "s2",
         type: "tuple[]",
       },
     ],
     name: "relayBySigs",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        components: [
+          { internalType: "address", name: "delegatee", type: "address" },
+          { internalType: "uint256", name: "nonce", type: "uint256" },
+          { internalType: "uint256", name: "expiry", type: "uint256" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
+        ],
+        internalType: "struct SigRelayer2.DelegationSig[]",
+        name: "s1",
+        type: "tuple[]",
+      },
+      {
+        components: [
+          { internalType: "uint256", name: "proposalId", type: "uint256" },
+          { internalType: "uint8", name: "support", type: "uint8" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
+        ],
+        internalType: "struct SigRelayer2.VoteSig[]",
+        name: "s2",
+        type: "tuple[]",
+      },
+    ],
+    name: "relayBySigsGST",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
@@ -158,3 +193,5 @@ const SIG_RELAYER_ABI = [
     type: "function",
   },
 ];
+
+export default SIG_RELAYER_ABI;

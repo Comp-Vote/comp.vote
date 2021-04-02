@@ -15,7 +15,7 @@ export default function Home({ defaultProposals, defaultPages }) {
 
   // Web3 + Authenticate function from context
   const { web3, authenticate } = web3p.useContainer();
-  const { voteFor, voteAgainst, abstain } = vote.useContainer();
+  const { voteFor, voteAgainst, voteAbstain } = vote.useContainer();
 
   /**
    * Util: Uppercase first letter of word
@@ -87,7 +87,7 @@ export default function Home({ defaultProposals, defaultPages }) {
       		await voteAgainst(proposalId);
       		break;
       	default:
-      		await abstain(proposalId);
+      		await voteAbstain(proposalId);
       }
     } catch {
       // If MetaMask cancellation, toggle button loading to false

@@ -1,4 +1,4 @@
-[
+const GOVERNOR_BRAVO_ABI = [
   {
     anonymous: false,
     inputs: [
@@ -666,3 +666,5 @@
     type: "function",
   },
 ];
+
+export default GOVERNOR_BRAVO_ABI;
