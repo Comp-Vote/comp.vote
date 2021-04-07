@@ -22,7 +22,7 @@ function useVote() {
       ],
       Ballot: [
         { name: "proposalId", type: "uint256" },
-        { name: "support", type: "bool" },
+        { name: "support", type: "uint8" },
       ],
     };
 
@@ -32,15 +32,14 @@ function useVote() {
       primaryType: "Ballot",
       // Compound Governor contract
       domain: {
-        name: "Compound Governor Alpha",
+        name: "Compound Governor Bravo",
         chainId: 1,
-        verifyingContract: "0xc0da01a04c3f3e0be433606045bb7017a7323e38",
+        verifyingContract: "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
       },
       // Message
       message: {
         proposalId,
-        // Enforce true || false
-        support: !!support,
+        support: support,
       },
     });
   };
@@ -78,11 +77,11 @@ function useVote() {
    */
   const voteFor = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, true);
+    const msgParams = createVoteBySigMessage(proposalId, 1);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
-    await castVote(proposalId, true, signedMsg);
+    await castVote(proposalId, 1, signedMsg);
   };
 
   /**
@@ -91,11 +90,24 @@ function useVote() {
    */
   const voteAgainst = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, false);
+    const msgParams = createVoteBySigMessage(proposalId, 0);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
-    await castVote(proposalId, false, signedMsg);
+    await castVote(proposalId, 0, signedMsg);
+  };
+
+  /**
+   * Generate an ABSTAIN vote for the proposalId
+   * @param {Number} proposalId of compund governance proposal
+   */
+  const voteAbstain = async (proposalId) => {
+    // Generate and sign message
+    const msgParams = createVoteBySigMessage(proposalId, 2);
+    const signedMsg = await signVote(msgParams);
+
+    // POST vote to server
+    await castVote(proposalId, 2, signedMsg);
   };
 
   /**
@@ -135,6 +147,7 @@ function useVote() {
   return {
     voteFor,
     voteAgainst,
+    voteAbstain
   };
 }
 

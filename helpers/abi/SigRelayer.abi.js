@@ -1,11 +1,8 @@
 const SIG_RELAYER_ABI = [
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "governorAlpha_",
-        type: "address",
-      },
+      { internalType: "address", name: "governorBravo_", type: "address" },
+      { internalType: "address", name: "compToken_", type: "address" },
     ],
     payable: false,
     stateMutability: "nonpayable",
@@ -15,13 +12,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "BALLOT_TYPEHASH",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -30,13 +21,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "DELEGATION_TYPEHASH",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -45,13 +30,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "DOMAIN_TYPEHASH",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -60,13 +39,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "compToken",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -74,14 +47,8 @@ const SIG_RELAYER_ABI = [
   {
     constant: true,
     inputs: [],
-    name: "governorAlpha",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    name: "governorBravo",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -90,13 +57,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "name",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
+    outputs: [{ internalType: "string", name: "", type: "string" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -105,13 +66,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "name2",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
+    outputs: [{ internalType: "string", name: "", type: "string" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -120,13 +75,7 @@ const SIG_RELAYER_ABI = [
     constant: true,
     inputs: [],
     name: "owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -136,70 +85,26 @@ const SIG_RELAYER_ABI = [
     inputs: [
       {
         components: [
-          {
-            internalType: "address",
-            name: "delegatee",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "nonce",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "expiry",
-            type: "uint256",
-          },
-          {
-            internalType: "uint8",
-            name: "v",
-            type: "uint8",
-          },
-          {
-            internalType: "bytes32",
-            name: "r",
-            type: "bytes32",
-          },
-          {
-            internalType: "bytes32",
-            name: "s",
-            type: "bytes32",
-          },
+          { internalType: "address", name: "delegatee", type: "address" },
+          { internalType: "uint256", name: "nonce", type: "uint256" },
+          { internalType: "uint256", name: "expiry", type: "uint256" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
         ],
-        internalType: "struct SigRelayer.DelegationSig[]",
+        internalType: "struct SigRelayer2.DelegationSig[]",
         name: "s1",
         type: "tuple[]",
       },
       {
         components: [
-          {
-            internalType: "uint256",
-            name: "proposalId",
-            type: "uint256",
-          },
-          {
-            internalType: "bool",
-            name: "support",
-            type: "bool",
-          },
-          {
-            internalType: "uint8",
-            name: "v",
-            type: "uint8",
-          },
-          {
-            internalType: "bytes32",
-            name: "r",
-            type: "bytes32",
-          },
-          {
-            internalType: "bytes32",
-            name: "s",
-            type: "bytes32",
-          },
+          { internalType: "uint256", name: "proposalId", type: "uint256" },
+          { internalType: "uint8", name: "support", type: "uint8" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
         ],
-        internalType: "struct SigRelayer.VoteSig[]",
+        internalType: "struct SigRelayer2.VoteSig[]",
         name: "s2",
         type: "tuple[]",
       },
@@ -214,12 +119,43 @@ const SIG_RELAYER_ABI = [
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "newGovernorAlpha",
-        type: "address",
+        components: [
+          { internalType: "address", name: "delegatee", type: "address" },
+          { internalType: "uint256", name: "nonce", type: "uint256" },
+          { internalType: "uint256", name: "expiry", type: "uint256" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
+        ],
+        internalType: "struct SigRelayer2.DelegationSig[]",
+        name: "s1",
+        type: "tuple[]",
+      },
+      {
+        components: [
+          { internalType: "uint256", name: "proposalId", type: "uint256" },
+          { internalType: "uint8", name: "support", type: "uint8" },
+          { internalType: "uint8", name: "v", type: "uint8" },
+          { internalType: "bytes32", name: "r", type: "bytes32" },
+          { internalType: "bytes32", name: "s", type: "bytes32" },
+        ],
+        internalType: "struct SigRelayer2.VoteSig[]",
+        name: "s2",
+        type: "tuple[]",
       },
     ],
-    name: "setGovernorAlpha",
+    name: "relayBySigsGST",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      { internalType: "address", name: "governorBravo_", type: "address" },
+    ],
+    name: "setGovernorBravo",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
@@ -228,45 +164,15 @@ const SIG_RELAYER_ABI = [
   {
     constant: true,
     inputs: [
-      {
-        internalType: "address",
-        name: "delegatee",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "nonce",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "expiry",
-        type: "uint256",
-      },
-      {
-        internalType: "uint8",
-        name: "v",
-        type: "uint8",
-      },
-      {
-        internalType: "bytes32",
-        name: "r",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "s",
-        type: "bytes32",
-      },
+      { internalType: "address", name: "delegatee", type: "address" },
+      { internalType: "uint256", name: "nonce", type: "uint256" },
+      { internalType: "uint256", name: "expiry", type: "uint256" },
+      { internalType: "uint8", name: "v", type: "uint8" },
+      { internalType: "bytes32", name: "r", type: "bytes32" },
+      { internalType: "bytes32", name: "s", type: "bytes32" },
     ],
     name: "signatoryFromDelegateSig",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -274,40 +180,14 @@ const SIG_RELAYER_ABI = [
   {
     constant: true,
     inputs: [
-      {
-        internalType: "uint256",
-        name: "proposalId",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "support",
-        type: "bool",
-      },
-      {
-        internalType: "uint8",
-        name: "v",
-        type: "uint8",
-      },
-      {
-        internalType: "bytes32",
-        name: "r",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "s",
-        type: "bytes32",
-      },
+      { internalType: "uint256", name: "proposalId", type: "uint256" },
+      { internalType: "uint8", name: "support", type: "uint8" },
+      { internalType: "uint8", name: "v", type: "uint8" },
+      { internalType: "bytes32", name: "r", type: "bytes32" },
+      { internalType: "bytes32", name: "s", type: "bytes32" },
     ],
     name: "signatoryFromVoteSig",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",

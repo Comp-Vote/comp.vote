@@ -337,6 +337,23 @@
   }
 }
 
+.abstain {
+  border-color: #000000;
+  color: #000000;
+
+  > div > div {
+    background-color: #000000;
+  }
+}
+
+.abstain:hover {
+  background-color: #000000 !important;
+
+  > div > div {
+    background-color: #fff;
+  }
+}
+
 // Custom delegation card
 .customDelegate {
   padding: 16px 28px;
