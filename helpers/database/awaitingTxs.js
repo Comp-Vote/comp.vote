@@ -107,6 +107,11 @@ const voteAllowed = async (address, proposalId) => {
   const { db } = await connectToDatabase();
 
   const pendingTxs = await db.find({executed:false}).toArray();
+  pendingTxs.forEach((tx) => {
+    delete tx._id;
+    delete tx.executed;
+    delete tx.createdAt;
+  });
   return pendingTxs;
  }
 

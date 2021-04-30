@@ -18,5 +18,5 @@ export default async (req, res) => {
     return;
   }
 
-  res.status(200).end(JSON.stringify(pendingTransactions,undefined,4));
+  res.status(200).json(pendingTransactions);
 };
