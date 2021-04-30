@@ -99,10 +99,22 @@ const voteAllowed = async (address, proposalId) => {
   }
 };
 
+/**
+
+ */
+ const pendingTransactions = async () => {
+  // Collect database connection
+  const { db } = await connectToDatabase();
+
+  const pendingTxs = await db.find({executed:false}).toArray();
+  return pendingTxs;
+ }
+
 // Export functions
 export {
   insertDelegateTx,
   insertVoteTx,
   delegationAllowed,
   voteAllowed,
+  pendingTransactions
 };
