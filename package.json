@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^4.0.0",
     "@walletconnect/web3-provider": "^1.6.6",
     "axios": "^0.21.0",
     "dayjs": "^1.9.6",
