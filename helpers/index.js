@@ -87,7 +87,7 @@ const createVoteBySigMessage = (proposalId, support) => {
  * @param {string} delegatee address to delegate voting power to
  * @param {integer} nonce transaction nonce
  */
-const createDelegateBySigMessage = (delegatee, nonce = 0) => {
+const createDelegateBySigMessage = (delegatee, nonce, expiry) => {
   // Types
   const types = {
     EIP712Domain: [
@@ -117,7 +117,7 @@ const createDelegateBySigMessage = (delegatee, nonce = 0) => {
       // Delegatee address
       delegatee,
       nonce: nonce,
-      expiry: 10e9,
+      expiry: expiry,
     },
   };
 };
@@ -408,7 +408,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
 
   // Address verified used to create signature
   let sigAddress;
-  const data = createDelegateBySigMessage(delegatee, nonce);
+  const data = createDelegateBySigMessage(delegatee, nonce, expiry);
 
   try {
     sigAddress = await recoverTypedSignature({
