@@ -16,6 +16,7 @@ import {
 } from "helpers/database/awaitingTxs"; // Database helper functions
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
+import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig verification
 
 /**
  * Instantiates server-side web3 connection
@@ -41,6 +42,83 @@ const Web3Handler = () => {
     sigRelayer,
     compToken,
     governorBravo,
+  };
+};
+
+/**
+ * Generate voting message
+ * @param {Number} proposalId for Compound Governance proposal
+ * @param {boolean} support for or against
+ */
+const createVoteBySigMessage = (proposalId, support) => {
+  // Types
+  const types = {
+    EIP712Domain: [
+      { name: "name", type: "string" },
+      { name: "chainId", type: "uint256" },
+      { name: "verifyingContract", type: "address" },
+    ],
+    Ballot: [
+      { name: "proposalId", type: "uint256" },
+      { name: "support", type: "uint8" },
+    ],
+  };
+
+  // Return message to sign
+  return {
+    types,
+    primaryType: "Ballot",
+    // Compound Governor contract
+    domain: {
+      name: "Compound Governor Bravo",
+      chainId: 1,
+      verifyingContract: "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
+    },
+    // Message
+    message: {
+      proposalId,
+      support: support,
+    },
+  };
+};
+
+/**
+ * Generate delegation message
+ * @param {string} delegatee address to delegate voting power to
+ * @param {integer} nonce transaction nonce
+ */
+const createDelegateBySigMessage = (delegatee, nonce, expiry) => {
+  // Types
+  const types = {
+    EIP712Domain: [
+      { name: "name", type: "string" },
+      { name: "chainId", type: "uint256" },
+      { name: "verifyingContract", type: "address" },
+    ],
+    Delegation: [
+      { name: "delegatee", type: "address" },
+      { name: "nonce", type: "uint256" },
+      { name: "expiry", type: "uint256" },
+    ],
+  };
+
+  // Return message to sign
+  return {
+    types,
+    primaryType: "Delegation",
+    // Compound COMP token contract
+    domain: {
+      name: "Compound",
+      chainId: 1,
+      verifyingContract: "0xc00e94cb662c3520282e6f5717214004a7f26888",
+    },
+    // Message
+    message: {
+      // Delegatee address
+      delegatee,
+      nonce: nonce,
+      expiry: expiry,
+    },
   };
 };
 
@@ -234,7 +312,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     throw error;
   }
 
-  if(support > 2) {
+  if (support > 2) {
     const error = new Error("invalid support value");
     error.code = 422;
     throw error;
@@ -245,24 +323,17 @@ const vote = async (address, proposalId, support, v, r, s) => {
 
   // Address verified used to create signature
   let sigAddress;
-
+  const data = createVoteBySigMessage(proposalId, support);
   try {
-    [sigAddress] = await Promise.all([
-      sigRelayer.methods
-        .signatoryFromVoteSig(proposalId, support, v, r, s)
-        .call(),
-      canVote(address, proposalId),
-    ]);
-  } catch (error) {
-    // Pass error from db
-    if (typeof error.code == "number") {
-      throw error;
-    }
-
-    // Else, send error from database
-    const newError = new Error("error fetching data from blockchain");
-    newError.code = 500;
-    throw newError;
+    sigAddress = await recoverTypedSignature({
+      data: data,
+      signature: r + s.substring(2) + v.substring(2),
+      version: "V4",
+    });
+  } catch (err) {
+    const newErr = new Error("invalid signature");
+    newErr.code = 422;
+    throw newErr;
   }
 
   // Force address formatting
@@ -270,9 +341,22 @@ const vote = async (address, proposalId, support, v, r, s) => {
 
   // Address verified to create sig and alleged must match
   if (address.localeCompare(sigAddress) != 0) {
-    const error = new Error("given address does not match signer address");
+    const error = new Error("invalid signature");
     error.code = 422;
     throw error;
+  }
+
+  try {
+    await canVote(address, proposalId);
+  } catch (error) {
+    // Pass error from db
+    if (typeof error.code == "number") {
+      throw error;
+    }
+    // Else, send error from database
+    const newError = new Error("error fetching data from blockchain");
+    newError.code = 500;
+    throw newError;
   }
 
   // Create new transactions
@@ -324,24 +408,18 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
 
   // Address verified used to create signature
   let sigAddress;
+  const data = createDelegateBySigMessage(delegatee, nonce, expiry);
 
   try {
-    [sigAddress] = await Promise.all([
-      sigRelayer.methods
-        .signatoryFromDelegateSig(delegatee, nonce, expiry, v, r, s)
-        .call(),
-      canDelegate(address, delegatee),
-    ]);
-  } catch (error) {
-    // Return error from db
-    if (typeof error.code == "number") {
-      throw error;
-    }
-
-    // Else, return blockchain error
-    const newError = new Error("error fetching data from blockchain");
-    newError.code = 500;
-    throw newError;
+    sigAddress = await recoverTypedSignature({
+      data: data,
+      signature: r + s.substring(2) + v.substring(2),
+      version: "V4",
+    });
+  } catch (err) {
+    const newErr = new Error("invalid signature");
+    newErr.code = 422;
+    throw newErr;
   }
 
   // Force address formatting
@@ -352,6 +430,20 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
     const error = new Error("given address does not match signer address");
     error.code = 422;
     throw error;
+  }
+
+  try {
+    await canDelegate(address, delegatee);
+  } catch (error) {
+    // Return error from db
+    if (typeof error.code == "number") {
+      throw error;
+    }
+
+    // Else, return blockchain error
+    const newError = new Error("error fetching data from blockchain");
+    newError.code = 500;
+    throw newError;
   }
 
   // Create transaction
@@ -380,8 +472,8 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
 };
 
 const getPendingTransactions = async () => {
-  return await pendingTransactions()
-}
+  return await pendingTransactions();
+};
 
 // Export functions
 export { canDelegate, canVote, vote, delegate, getPendingTransactions };
