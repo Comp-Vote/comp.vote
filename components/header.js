@@ -4,11 +4,13 @@ import { useRouter } from "next/router"; // Router
 import { useState, useEffect } from "react"; // State management
 import styles from "styles/layout.module.scss"; // Styles
 import HamburgerMenu from "react-hamburger-menu"; // Hamburger button
+import useENS from "./hooks/useENS";
 
 export default function Header() {
   const router = useRouter(); // Router
   const [menuOpen, setMenuOpen] = useState(false); // Mobile menu
   const { address, authenticate, unauthenticate } = web3p.useContainer(); // State from context
+  const { ensName } = useENS(address);
 
   /**
    * Update menu state by checking window dimensions
@@ -84,9 +86,10 @@ export default function Header() {
             <button onClick={unauthenticate}>
               {/* User address */}
               <span>
-                {address.substr(0, 5) +
-                  "..." +
-                  address.slice(address.length - 5)}
+                {ensName ||
+                  address.substr(0, 5) +
+                    "..." +
+                    address.slice(address.length - 5)}
               </span>
               {/* Logout icon SVG */}
               <svg viewBox="0 0 512 512">
