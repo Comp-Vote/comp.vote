@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"; // State management
 import styles from "styles/layout.module.scss"; // Styles
 import HamburgerMenu from "react-hamburger-menu"; // Hamburger button
 import useENS from "./hooks/useENS";
+import Davatar from "@davatar/react";
 
 export default function Header() {
   const router = useRouter(); // Router
@@ -85,11 +86,16 @@ export default function Header() {
             // If user is authenticated, show unauthenticate button
             <button onClick={unauthenticate}>
               {/* User address */}
-              <span>
-                {ensName ||
-                  address.substr(0, 5) +
-                    "..." +
-                    address.slice(address.length - 5)}
+              <span className={styles.account}>
+                <span className={styles.davatar}>
+                  <Davatar size={24} address={address} />
+                </span>
+                <span>
+                  {ensName ||
+                    address.substr(0, 5) +
+                      "..." +
+                      address.slice(address.length - 5)}
+                </span>
               </span>
               {/* Logout icon SVG */}
               <svg viewBox="0 0 512 512">
