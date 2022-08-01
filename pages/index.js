@@ -76,7 +76,6 @@ export default function Home({ defaultProposals, defaultPages }) {
   const voteWithLoading = async (proposalId, type) => {
     // Toggle button loading to true
     setButtonLoading({ id: proposalId, type: type });
-    console.log(type);
     try {
       // Call voteFor or voteAgainst based on type
       switch(Number(type)) {

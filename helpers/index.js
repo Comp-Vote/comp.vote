@@ -1,11 +1,12 @@
 import {
   COMP_ABI,
   SIG_RELAYER_ABI,
-  GOVERNER_ALPHA_ABI,
   GOVERNOR_BRAVO_ABI,
   SIG_RELAYER_ADDRESS,
   COMP_ADDRESS,
   GOVERNANCE_ADDRESS,
+  MULTICALL_ABI,
+  MULTICALL_ADDRESS
 } from "helpers/abi"; // Contract ABIs + Addresses
 import {
   insertDelegateTx,
@@ -21,7 +22,7 @@ import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig v
 /**
  * Instantiates server-side web3 connection
  */
-const Web3Handler = () => {
+export const Web3Handler = () => {
   // Setup web3 handler
   const web3 = new Web3(process.env.NEXT_PUBLIC_INFURA_RPC);
 
@@ -35,6 +36,7 @@ const Web3Handler = () => {
     GOVERNOR_BRAVO_ABI,
     GOVERNANCE_ADDRESS
   );
+  const multicall = new web3.eth.Contract(MULTICALL_ABI, MULTICALL_ADDRESS);
 
   // Return web3 + contracts
   return {
@@ -42,6 +44,7 @@ const Web3Handler = () => {
     sigRelayer,
     compToken,
     governorBravo,
+    multicall
   };
 };
 
@@ -318,7 +321,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     throw error;
   }
 
-  if(v == "0x00" || v == "0x01") {
+  if (v == "0x00" || v == "0x01") {
     const error = new Error("invalid signature v input");
     error.code = 422;
     throw error;
