@@ -31,7 +31,7 @@ export default async (req, res) => {
   );
 
   const voteWeightCalls = pendingTxsWithStartBlocks.map((tx) => {
-    if (tx.type !== "vote") return null;
+    if(!tx || tx.type !== "vote") return null;
     return {
       target: compToken._address,
       callData: compToken.methods
