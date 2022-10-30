@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@compound-finance/comet-extension": "https://github.com/compound-finance/comet-extension.git#c5ebb8a10e1dd180a93c2cb4918c41b228317ce4",
     "@davatar/react": "^1.8.1",
     "@ethersproject/providers": "^5.5.2",
     "@metamask/eth-sig-util": "^4.0.0",
@@ -25,5 +26,11 @@
     "unstated-next": "^1.1.0",
     "web3": "1.7.3",
     "web3modal": "^1.9.2"
+  },
+  "resolutions": {
+    "**/postcss": "8.4.18"
+  },
+  "volta": {
+    "node": "16.16.0"
   }
 }

@@ -268,17 +268,17 @@ const canVote = async (address, proposalId) => {
   }
 
   // Not ongoing proposal. Leaves a 5 block buffer for last minute relay
-  if (
-    !(
-      currentBlock > proposal.startBlock &&
-      currentBlock < proposal.endBlock - 2025
-    ) ||
-    proposal.canceled
-  ) {
-    const error = new Error("proposal voting period is not active");
-    error.code = 400;
-    throw error;
-  }
+  // if (
+  //   !(
+  //     currentBlock > proposal.startBlock &&
+  //     currentBlock < proposal.endBlock - 2025
+  //   ) ||
+  //   proposal.canceled
+  // ) {
+  //   const error = new Error("proposal voting period is not active");
+  //   error.code = 400;
+  //   throw error;
+  // }
 
   // Require at least min comp COMP delegated
   if (parseInt(votesDelegated) < parseInt(process.env.MIN_COMP)) {

@@ -167,8 +167,7 @@ export default function Home({ defaultProposals, defaultPages }) {
                       >
                         Info
                       </button>
-                      {proposal.states[proposal.states.length - 1].state ===
-                      "active" ? (
+                      {true ? (
                         // Check if proposal is active
                         web3 ? (
                           // If authenticated and proposal active, return voting + info buttons
