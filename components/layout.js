@@ -2,10 +2,8 @@ import { useContext } from "react";
 import Head from "next/head"; // Meta
 import Header from "components/header"; // Header component
 import styles from "styles/layout.module.scss"; // Component styles
-import { Embedded } from "containers"; // Embedded
 
 export default function Layout({ children }) {
-  const embedded = useContext(Embedded);
 
   return (
     <div>
@@ -76,12 +74,9 @@ export default function Layout({ children }) {
       </Head>
 
       {/* Header */}
-      { !embedded ?
-        <div>
-          <Header />
-        </div>
-        : null
-      }
+      <div>
+        <Header />
+      </div>
 
       {/* Page content */}
       <div className={styles.content}>{children}</div>
