@@ -245,9 +245,9 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@compound-finance/comet-extension@https://github.com/compound-finance/comet-extension.git#c5ebb8a10e1dd180a93c2cb4918c41b228317ce4":
-  version "0.0.4"
-  resolved "https://github.com/compound-finance/comet-extension.git#c5ebb8a10e1dd180a93c2cb4918c41b228317ce4"
+"@compound-finance/comet-extension@https://github.com/compound-finance/comet-extension.git#ef482bb69da0ddcf164bd2620a5b587d8d9dd19a":
+  version "0.0.5"
+  resolved "https://github.com/compound-finance/comet-extension.git#ef482bb69da0ddcf164bd2620a5b587d8d9dd19a"
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/providers" "^5.7.1"

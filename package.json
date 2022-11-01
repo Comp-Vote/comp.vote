@@ -9,7 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@compound-finance/comet-extension": "https://github.com/compound-finance/comet-extension.git#c5ebb8a10e1dd180a93c2cb4918c41b228317ce4",
+    "@compound-finance/comet-extension": "https://github.com/compound-finance/comet-extension.git#ef482bb69da0ddcf164bd2620a5b587d8d9dd19a",
     "@davatar/react": "^1.8.1",
     "@ethersproject/providers": "^5.5.2",
     "@metamask/eth-sig-util": "^4.0.0",
