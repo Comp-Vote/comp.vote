@@ -1,8 +1,12 @@
+import { useContext } from "react";
 import Web3 from "web3"; // Web3
 import Web3Modal from "web3modal"; // Web3Modal
 import { useState, useEffect } from "react"; // State management
 import { createContainer } from "unstated-next"; // Unstated-next containerization
 import WalletConnectProvider from "@walletconnect/web3-provider"; // WalletConnectProvider (Web3Modal)
+import { RPCWeb3Provider } from '@compound-finance/comet-extension';
+import { useRPC } from '../components/hooks/useRPC';
+import { Embedded } from "containers"; // Embedded
 
 // Web3Modal provider options
 const providerOptions = {
@@ -16,6 +20,8 @@ const providerOptions = {
 };
 
 function useWeb3() {
+  const embedded = useContext(Embedded);
+  const rpc = useRPC();
   const [web3, setWeb3] = useState(null); // Web3 provider
   const [modal, setModal] = useState(null); // Web3Modal
   const [address, setAddress] = useState(null); // ETH address
@@ -40,7 +46,12 @@ function useWeb3() {
    */
   const authenticate = async () => {
     // Toggle modal
-    const provider = await modal.connect();
+    let provider;
+    if (!embedded) {
+      provider = await modal.connect();
+    } else {
+      provider = new RPCWeb3Provider(rpc.sendRPC);
+    }
 
     // Generate web3 object and save
     const web3 = new Web3(provider);
@@ -80,7 +91,11 @@ function useWeb3() {
   // On mount
   useEffect(() => {
     // Setup web3modal
-    setupWeb3Modal();
+    if (!embedded) {
+      setupWeb3Modal();
+    } else {
+      authenticate();
+    }
   }, []);
 
   return {

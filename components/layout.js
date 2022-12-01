@@ -1,8 +1,10 @@
+import { useContext } from "react";
 import Head from "next/head"; // Meta
 import Header from "components/header"; // Header component
 import styles from "styles/layout.module.scss"; // Component styles
 
 export default function Layout({ children }) {
+
   return (
     <div>
       {/* Meta Setup */}

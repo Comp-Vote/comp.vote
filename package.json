@@ -2,12 +2,16 @@
   "name": "comp.vote",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "@compound-finance/comet-extension": "^0.0.11",
     "@davatar/react": "^1.8.1",
     "@ethersproject/providers": "^5.5.2",
     "@metamask/eth-sig-util": "^4.0.0",
@@ -25,5 +29,8 @@
     "unstated-next": "^1.1.0",
     "web3": "1.7.3",
     "web3modal": "^1.9.2"
+  },
+  "volta": {
+    "node": "16.16.0"
   }
 }
