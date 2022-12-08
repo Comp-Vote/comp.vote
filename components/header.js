@@ -80,6 +80,7 @@ export default function Header() {
           </ul>
         </div>
 
+        {/* Authenticate button */}
         <div>
           {address ? (
             // If user is authenticated, show unauthenticate button
