@@ -13,10 +13,10 @@ export default function Home(props) {
   const [pages, setPages] = useState(props.defaultPages); // Proposal pagination
   const embedded = useContext(Embedded);
 
-  const pageContent = <VoteContent {...props} pages={pages} setPages={setPages} />;
+  const proposalsContent = <ProposalsContent {...props} pages={pages} setPages={setPages} />;
   if (embedded) {
     // Don't wrap the content when embedded.
-    return pageContent;
+    return proposalsContent;
   }
 
   return (
@@ -42,7 +42,7 @@ export default function Home(props) {
         </div>
       </div>
       <div className={styles.body}>
-        <VoteContent {...props} pages={pages} setPages={setPages} />
+        {proposalsContent}
         {/* Swagger API CTA card */}
         <APICTA />
       </div>
@@ -50,7 +50,7 @@ export default function Home(props) {
   )
 }
 
-function VoteContent({ defaultProposals, pages, setPages }) {
+function ProposalsContent({ defaultProposals, pages, setPages }) {
   const [loading, setLoading] = useState(false); // Proposal loading state
   const [proposals, setProposals] = useState(defaultProposals); // Proposals array
   const [buttonLoading, setButtonLoading] = useState({ id: null, type: null }); // Current button loading state
