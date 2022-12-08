@@ -1,15 +1,57 @@
 import axios from "axios"; // Requests wrapper
 import dayjs from "dayjs"; // Dayjs
-import { useState } from "react"; // State management
+import { useContext, useState } from "react"; // State management
 import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import { web3p, vote } from "containers"; // Context
 import styles from "styles/page.module.scss"; // Page styles
 import BeatLoader from "react-spinners/BeatLoader"; // Loading state
+import { Embedded } from "containers"; // Embedded
 
-export default function Home({ defaultProposals, defaultPages }) {
+
+export default function Home(props) {
+  const [pages, setPages] = useState(props.defaultPages); // Proposal pagination
+  const embedded = useContext(Embedded);
+
+  const proposalsContent = <ProposalsContent {...props} pages={pages} setPages={setPages} />;
+  if (embedded) {
+    // Don't wrap the content when embedded.
+    return proposalsContent;
+  }
+
+  return (
+    <Layout>
+      {/* Page head */}
+      <div className={styles.head}>
+        <div>
+          {/* Description of voting by signature */}
+          <h1>Vote By Signature</h1>
+          <div>
+            <p>
+              Voting by signature lets you place votes across Compound Governance
+              proposals, without having to send your transactions on-chain,
+              saving fees.
+            </p>
+          </div>
+
+          {/* Number of voteable proposals */}
+          <div>
+            <h2>{pages.entries}</h2>
+            <h3>Total Proposals</h3>
+          </div>
+        </div>
+      </div>
+      <div className={styles.body}>
+        {proposalsContent}
+        {/* Swagger API CTA card */}
+        <APICTA />
+      </div>
+    </Layout>
+  )
+}
+
+function ProposalsContent({ defaultProposals, pages, setPages }) {
   const [loading, setLoading] = useState(false); // Proposal loading state
-  const [pages, setPages] = useState(defaultPages); // Proposal pagination
   const [proposals, setProposals] = useState(defaultProposals); // Proposals array
   const [buttonLoading, setButtonLoading] = useState({ id: null, type: null }); // Current button loading state
 
@@ -98,149 +140,120 @@ export default function Home({ defaultProposals, defaultPages }) {
   };
 
   return (
-    <Layout>
-      {/* Page head */}
-      <div className={styles.head}>
+    <div>
+      {/* Recent proposals card */}
+      <div className={styles.card}>
+        {/* Card header */}
         <div>
-          {/* Description of voting by signature */}
-          <h1>Vote By Signature</h1>
-          <div>
-            <p>
-              Voting by signature lets you place votes across Compound Governance
-              proposals, without having to send your transactions on-chain,
-              saving fees.
-            </p>
-          </div>
-
-          {/* Number of voteable proposals */}
-          <div>
-            <h2>{pages.entries}</h2>
-            <h3>Total Proposals</h3>
-          </div>
+          <h4>Recent Proposals</h4>
         </div>
-      </div>
 
-      {/* Page body */}
-      <div className={styles.body}>
+        {/* Card proposals */}
         <div>
-          {/* Recent proposals card */}
-          <div className={styles.card}>
-            {/* Card header */}
-            <div>
-              <h4>Recent Proposals</h4>
-            </div>
+          {proposals.map((proposal, i) => {
+            // For each proposal in proposals array return:
+            return (
+              <div className={styles.proposal} key={i}>
+                {/* Proposal info */}
+                <div>
+                  {/* Truncated proposal name */}
+                  <h4>
+                    {proposal.title.split(" ").splice(0, 10).join(" ")}
+                    {proposal.title.split(" ").length > 10 ? "..." : ""}
+                  </h4>
 
-            {/* Card proposals */}
-            <div>
-              {proposals.map((proposal, i) => {
-                // For each proposal in proposals array return:
-                return (
-                  <div className={styles.proposal} key={i}>
-                    {/* Proposal info */}
-                    <div>
-                      {/* Truncated proposal name */}
-                      <h4>
-                        {proposal.title.split(" ").splice(0, 10).join(" ")}
-                        {proposal.title.split(" ").length > 10 ? "..." : ""}
-                      </h4>
+                  {/* Proposal ID + Status + Status update date */}
+                  <span>
+                    {proposal.id} •{" "}
+                    {firstUppercase(
+                      proposal.states[proposal.states.length - 1].state
+                    )}{" "}
+                    {dayjs
+                      .unix(
+                        proposal.states[proposal.states.length - 1]
+                          .start_time
+                      )
+                      .format("MMMM D, YYYY")}
+                  </span>
+                </div>
 
-                      {/* Proposal ID + Status + Status update date */}
-                      <span>
-                        {proposal.id} •{" "}
-                        {firstUppercase(
-                          proposal.states[proposal.states.length - 1].state
-                        )}{" "}
-                        {dayjs
-                          .unix(
-                            proposal.states[proposal.states.length - 1]
-                              .start_time
-                          )
-                          .format("MMMM D, YYYY")}
-                      </span>
-                    </div>
-
-                    {/* Proposal actions */}
-                    <div>
+                {/* Proposal actions */}
+                <div>
+                  <button
+                    onClick={() => proposalInfo(proposal.id)}
+                    className={styles.info}
+                  >
+                    Info
+                  </button>
+                  {proposal.states[proposal.states.length - 1].state ===
+                  "active" ? (
+                    // Check if proposal is active
+                    web3 ? (
+                      // If authenticated and proposal active, return voting + info buttons
+                      <>
+                        <button
+                          onClick={() => voteWithLoading(proposal.id, 0)}
+                          className={styles.for}
+                        >
+                          {buttonLoading.id === proposal.id &&
+                          buttonLoading.type === 0 ? (
+                            <BeatLoader size={9} />
+                          ) : (
+                            "Vote For"
+                          )}
+                        </button>
+                        <button
+                          onClick={() => voteWithLoading(proposal.id, 1)}
+                          className={styles.against}
+                        >
+                          {buttonLoading.id === proposal.id &&
+                          buttonLoading.type === 1 ? (
+                            <BeatLoader size={9} />
+                          ) : (
+                            "Vote Against"
+                          )}
+                        </button>
+                        <button
+                          onClick={() => voteWithLoading(proposal.id, 2)}
+                          className={styles.abstain}
+                        >
+                          {buttonLoading.id === proposal.id &&
+                          buttonLoading.type === 2 ? (
+                            <BeatLoader size={9} />
+                          ) : (
+                            "Abstain"
+                          )}
+                        </button>
+                      </>
+                    ) : (
+                      // Else, return button to authenticate for active proposals
                       <button
-                        onClick={() => proposalInfo(proposal.id)}
                         className={styles.info}
+                        onClick={authenticate}
                       >
-                        Info
+                        Authenticate to vote
                       </button>
-                      {proposal.states[proposal.states.length - 1].state ===
-                      "active" ? (
-                        // Check if proposal is active
-                        web3 ? (
-                          // If authenticated and proposal active, return voting + info buttons
-                          <>
-                            <button
-                              onClick={() => voteWithLoading(proposal.id, 0)}
-                              className={styles.for}
-                            >
-                              {buttonLoading.id === proposal.id &&
-                              buttonLoading.type === 0 ? (
-                                <BeatLoader size={9} />
-                              ) : (
-                                "Vote For"
-                              )}
-                            </button>
-                            <button
-                              onClick={() => voteWithLoading(proposal.id, 1)}
-                              className={styles.against}
-                            >
-                              {buttonLoading.id === proposal.id &&
-                              buttonLoading.type === 1 ? (
-                                <BeatLoader size={9} />
-                              ) : (
-                                "Vote Against"
-                              )}
-                            </button>
-                            <button
-                              onClick={() => voteWithLoading(proposal.id, 2)}
-                              className={styles.abstain}
-                            >
-                              {buttonLoading.id === proposal.id &&
-                              buttonLoading.type === 2 ? (
-                                <BeatLoader size={9} />
-                              ) : (
-                                "Abstain"
-                              )}
-                            </button>
-                          </>
-                        ) : (
-                          // Else, return button to authenticate for active proposals
-                          <button
-                            className={styles.info}
-                            onClick={authenticate}
-                          >
-                            Authenticate to vote
-                          </button>
-                        )
-                      ) : // Else, return only Info button
-                      null}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* More proposals loading button */}
-            {pages.current < pages.max ? (
-              // If current number of pages < max, show:
-              <div className={styles.cardMore}>
-                {/* Load more proposals button */}
-                <button onClick={getNextPage} disabled={loading}>
-                  {loading ? "Loading..." : "Load More Proposals"}
-                </button>
+                    )
+                  ) : // Else, return only Info button
+                  null}
+                </div>
               </div>
-            ) : null}
-          </div>
+            );
+          })}
         </div>
 
-        {/* Swagger API CTA card */}
-        <APICTA />
+        {/* More proposals loading button */}
+        {pages.current < pages.max ? (
+          // If current number of pages < max, show:
+          <div className={styles.cardMore}>
+            {/* Load more proposals button */}
+            <button onClick={getNextPage} disabled={loading}>
+              {loading ? "Loading..." : "Load More Proposals"}
+            </button>
+          </div>
+        ) : null}
       </div>
-    </Layout>
+    </div>
   );
 }
 
