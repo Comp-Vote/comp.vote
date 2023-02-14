@@ -8,12 +8,13 @@ import styles from "styles/page.module.scss"; // Page styles
 import BeatLoader from "react-spinners/BeatLoader"; // Loading state
 import { Embedded } from "containers"; // Embedded
 
-
 export default function Home(props) {
   const [pages, setPages] = useState(props.defaultPages); // Proposal pagination
   const embedded = useContext(Embedded);
 
-  const proposalsContent = <ProposalsContent {...props} pages={pages} setPages={setPages} />;
+  const proposalsContent = (
+    <ProposalsContent {...props} pages={pages} setPages={setPages} />
+  );
   if (embedded) {
     // Don't wrap the content when embedded.
     return proposalsContent;
@@ -28,9 +29,9 @@ export default function Home(props) {
           <h1>Vote By Signature</h1>
           <div>
             <p>
-              Voting by signature lets you place votes across Compound Governance
-              proposals, without having to send your transactions on-chain,
-              saving fees.
+              Voting by signature lets you place votes across Compound
+              Governance proposals, without having to send your transactions
+              on-chain, saving fees.
             </p>
           </div>
 
@@ -47,7 +48,7 @@ export default function Home(props) {
         <APICTA />
       </div>
     </Layout>
-  )
+  );
 }
 
 function ProposalsContent({ defaultProposals, pages, setPages }) {
@@ -120,15 +121,15 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
     setButtonLoading({ id: proposalId, type: type });
     try {
       // Call voteFor or voteAgainst based on type
-      switch(Number(type)) {
-      	case 0:
-      		await voteFor(proposalId);
-      		break;
-      	case 1:
-      		await voteAgainst(proposalId);
-      		break;
-      	default:
-      		await voteAbstain(proposalId);
+      switch (Number(type)) {
+        case 0:
+          await voteFor(proposalId);
+          break;
+        case 1:
+          await voteAgainst(proposalId);
+          break;
+        default:
+          await voteAbstain(proposalId);
       }
     } catch {
       // If MetaMask cancellation, toggle button loading to false
@@ -170,8 +171,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                     )}{" "}
                     {dayjs
                       .unix(
-                        proposal.states[proposal.states.length - 1]
-                          .start_time
+                        proposal.states[proposal.states.length - 1].start_time
                       )
                       .format("MMMM D, YYYY")}
                   </span>
@@ -186,7 +186,9 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                     Info
                   </button>
                   {proposal.states[proposal.states.length - 1].state ===
-                  "active" ? (
+                    "active" ||
+                  proposal.states[proposal.states.length - 1].state ===
+                    "pending" ? (
                     // Check if proposal is active
                     web3 ? (
                       // If authenticated and proposal active, return voting + info buttons
@@ -227,10 +229,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                       </>
                     ) : (
                       // Else, return button to authenticate for active proposals
-                      <button
-                        className={styles.info}
-                        onClick={authenticate}
-                      >
+                      <button className={styles.info} onClick={authenticate}>
                         Authenticate to vote
                       </button>
                     )
