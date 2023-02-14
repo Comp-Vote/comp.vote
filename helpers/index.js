@@ -6,7 +6,7 @@ import {
   COMP_ADDRESS,
   GOVERNANCE_ADDRESS,
   MULTICALL_ABI,
-  MULTICALL_ADDRESS
+  MULTICALL_ADDRESS,
 } from "helpers/abi"; // Contract ABIs + Addresses
 import {
   insertDelegateTx,
@@ -44,7 +44,7 @@ export const Web3Handler = () => {
     sigRelayer,
     compToken,
     governorBravo,
-    multicall
+    multicall,
   };
 };
 
@@ -268,13 +268,7 @@ const canVote = async (address, proposalId) => {
   }
 
   // Not ongoing proposal. Leaves a 5 block buffer for last minute relay
-  if (
-    !(
-      currentBlock > proposal.startBlock &&
-      currentBlock < proposal.endBlock - 2025
-    ) ||
-    proposal.canceled
-  ) {
+  if (!(currentBlock < proposal.endBlock - 2025) || proposal.canceled) {
     const error = new Error("proposal voting period is not active");
     error.code = 400;
     throw error;
