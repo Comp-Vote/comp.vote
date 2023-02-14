@@ -251,14 +251,17 @@ const canVote = async (address, proposalId) => {
       voteAllowed(address, proposalId),
     ]);
 
-    // Check prior delegated votes
-    votesDelegated = await compToken.methods
-      .getPriorVotes(address, proposal.startBlock)
-      .call();
-  } catch (erorr) {
+    if (currentBlock >= proposal.startBlock) {
+      votesDelegated = await compToken.methods
+        .getPriorVotes(address, proposal.startBlock)
+        .call();
+    } else {
+      votesDelegated = await compToken.methods.getCurrentVotes(address).call();
+    }
+  } catch (error) {
     // Error thrown from DB vote allowed. Throw to res
-    if (typeof erorr.code == "number") {
-      throw erorr;
+    if (typeof error.code == "number") {
+      throw error;
     }
 
     // Else, throw blockchain error

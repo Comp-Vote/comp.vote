@@ -19,6 +19,8 @@ export default async (req, res) => {
 
   const { web3, multicall, compToken, governorBravo } = await Web3Handler();
 
+  const currentBlock = await web3.eth.getBlockNumber();
+
   const pendingTxsWithStartBlocks = await Promise.all(
     pendingTransactions.map(async (tx) => {
       if (tx.type !== "vote") return null;
@@ -31,12 +33,13 @@ export default async (req, res) => {
   );
 
   const voteWeightCalls = pendingTxsWithStartBlocks.map((tx) => {
-    if(!tx || tx.type !== "vote") return null;
+    if (!tx || tx.type !== "vote") return null;
     return {
       target: compToken._address,
-      callData: compToken.methods
-        .getPriorVotes(tx.from, tx.startBlock)
-        .encodeABI(),
+      callData:
+        currentBlock > tx.startBlock
+          ? compToken.methods.getPriorVotes(tx.from, tx.startBlock).encodeABI()
+          : compToken.methods.getCurrentVotes(tx.from).encodeABI(),
     };
   });
 
@@ -48,7 +51,11 @@ export default async (req, res) => {
   pendingTransactions = pendingTransactions.map((tx) => {
     if (tx.type !== "vote") return tx;
     return Object.assign({}, tx, {
-      voteWeight: web3.utils.toBN(voteWeights.shift()).div(web3.utils.toBN(10 ** 16)).toNumber()/100,
+      voteWeight:
+        web3.utils
+          .toBN(voteWeights.shift())
+          .div(web3.utils.toBN(10 ** 16))
+          .toNumber() / 100,
     });
   });
 
