@@ -77,7 +77,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
     setLoading(true);
 
     // Collect next page request string and request
-    const nextPage = `https://api.compound.finance/api/v2/governance/proposals?page_number=${
+    const nextPage = `https://v3-api.compound.finance/governance/mainnet/all/proposals?page_size=10&page_number=${
       pages.current + 1
     }`;
     const response = await axios.get(nextPage);
@@ -259,7 +259,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
 export async function getServerSideProps() {
   // Collect first page data
   const firstPage =
-    "https://api.compound.finance/api/v2/governance/proposals?page_number=1";
+    "https://v3-api.compound.finance/governance/mainnet/all/proposals?page_size=10";
   const response = await axios.get(firstPage);
 
   // Return:
