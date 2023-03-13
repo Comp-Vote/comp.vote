@@ -30,10 +30,7 @@ export default function Delegate({
     setLoading(true);
 
     // Collect next page request string and request
-
-    const nextPage = `https://api.compound.finance/api/v2/governance/accounts?page_size=10&page_number=${
-      pages.current + 1
-    }&with_history=false&network=mainnet`;
+    const nextPage = `https://v3-api.compound.finance/governance/mainnet/comp/accounts?page_size=10&with_details=false&page_number=${pages.current + 1}`;
     const response = await axios.get(nextPage);
 
     // Update proposals array with new proposals
@@ -308,13 +305,11 @@ export default function Delegate({
 
 export async function getServerSideProps() {
   // Collect first page data
-  const firstPage =
-    "https://api.compound.finance/api/v2/governance/accounts?page_size=10&page_number=1&with_history=false&network=mainnet";
+  const firstPage = `https://v3-api.compound.finance/governance/mainnet/comp/accounts?page_size=10&with_details=false`;
   const response = await axios.get(firstPage);
 
   // Collect delegated vote count
-  const historyURL =
-    "https://api.compound.finance/api/v2/governance/history?network=mainnet";
+  const historyURL = `https://v3-api.compound.finance/governance/mainnet/comp/history`;
   const historyResponse = await axios.get(historyURL);
 
   // Return:
