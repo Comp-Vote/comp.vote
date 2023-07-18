@@ -15,6 +15,7 @@
     "@davatar/react": "^1.8.1",
     "@ethersproject/providers": "^5.5.2",
     "@metamask/eth-sig-util": "^4.0.0",
+    "@walletconnect/ethereum-provider": "^2.9.0",
     "axios": "^0.21.0",
     "dayjs": "^1.9.6",
     "mongodb": "^3.6.3",
