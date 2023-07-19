@@ -61,7 +61,7 @@ function useVote() {
           // If no error
           if (!error) {
             // Resolve promise with resulting signature
-            resolve(result.result);
+            resolve(result);
           } else {
             // Reject promise with resulting error
             reject(error);
