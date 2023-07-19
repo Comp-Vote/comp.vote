@@ -25,6 +25,7 @@ function useWeb3() {
         projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID,
         chains: [1], // mainnet
         showQrModal: true, // prompts modal using @walletconnect/modal
+        methods: ["eth_signTypedData_v4"],
       });
       await provider.enable();
     } else {
