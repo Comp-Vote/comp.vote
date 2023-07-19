@@ -22,9 +22,9 @@ function useWeb3() {
     if (!embedded) {
       // EthereumProvider provider options (triggers WalletConnectModal)
       provider = await EthereumProvider.init({
-        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID, // required
-        chains: [1], // required
-        showQrModal: true, // requires @walletconnect/modal
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID,
+        chains: [1], // mainnet
+        showQrModal: true, // prompts modal using @walletconnect/modal
       });
       await provider.enable();
     } else {
