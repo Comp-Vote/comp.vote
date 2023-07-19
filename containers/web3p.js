@@ -68,7 +68,9 @@ function useWeb3() {
 
   // On mount
   useEffect(() => {
-    authenticate();
+    if (embedded) {
+      authenticate();
+    }
   }, []);
 
   return {
