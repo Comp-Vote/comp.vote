@@ -228,15 +228,12 @@ export default function Delegate({
             </div>
 
             {/* More accounts loading button */}
-            {pages.current < pages.max ? (
-              // If current number of pages < max, show:
-              <div className={styles.cardMore}>
-                {/* Load more accounts button */}
-                <button onClick={getNextPage} disabled={loading}>
-                  {loading ? "Loading..." : "Load More Delegates"}
-                </button>
-              </div>
-            ) : null}
+            <div className={styles.cardMore}>
+              {/* Load more accounts button */}
+              <button onClick={getNextPage} disabled={loading}>
+                {loading ? "Loading..." : "Load More Delegates"}
+              </button>
+            </div>
           </div>
 
           {/* Custom address delegation card */}
@@ -319,9 +316,7 @@ export async function getServerSideProps() {
       defaultAccounts: response.data.accounts,
       defaultPages: {
         // Current paginated proposal page (default: 1)
-        current: response.data.pagination_summary.page_number,
-        // Maximum number of paginated proposal pages
-        max: response.data.pagination_summary.total_pages,
+        current: 1,
       },
       // Total delegated vote count
       defaultDelegated: parseFloat(historyResponse.data.votes_delegated),
