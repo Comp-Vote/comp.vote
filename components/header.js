@@ -44,7 +44,7 @@ export default function Header() {
       <div>
         {/* Logo */}
         <div>
-          <Link href={`/`}>
+          <Link href={`/`} legacyBehavior>
             <a>
               <img
                 src="brand/compound-logo.svg"
@@ -60,14 +60,14 @@ export default function Header() {
         <div>
           <ul>
             <li>
-              <Link href={`/`}>
+              <Link href={`/`} legacyBehavior>
                 <a className={router.pathname === "/" ? styles.active : null}>
                   Vote
                 </a>
               </Link>
             </li>
             <li>
-              <Link href={`/delegate`}>
+              <Link href={`/delegate`} legacyBehavior>
                 <a
                   className={
                     router.pathname === "/delegate" ? styles.active : null
@@ -128,12 +128,12 @@ export default function Header() {
         >
           <ul>
             <li>
-              <Link href={`/`}>
+              <Link href={`/`} legacyBehavior>
                 <a>Vote</a>
               </Link>
             </li>
             <li>
-              <Link href={`/delegate`}>
+              <Link href={`/delegate`} legacyBehavior>
                 <a>Delegate</a>
               </Link>
             </li>

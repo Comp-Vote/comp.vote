@@ -1,54 +1,33 @@
 import { useContext } from "react";
 import Web3 from "web3"; // Web3
-import Web3Modal from "web3modal"; // Web3Modal
 import { useState, useEffect } from "react"; // State management
 import { createContainer } from "unstated-next"; // Unstated-next containerization
-import WalletConnectProvider from "@walletconnect/web3-provider"; // WalletConnectProvider (Web3Modal)
-import { RPCWeb3Provider } from '@compound-finance/comet-extension';
-import { useRPC } from '../components/hooks/useRPC';
+import { EthereumProvider } from "@walletconnect/ethereum-provider"; // EthereumProvider (WalletConnect3Modal)
+import { RPCWeb3Provider } from "@compound-finance/comet-extension";
+import { useRPC } from "../components/hooks/useRPC";
 import { Embedded } from "containers"; // Embedded
-
-// Web3Modal provider options
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      // Inject Infura
-      infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
-    },
-  },
-};
 
 function useWeb3() {
   const embedded = useContext(Embedded);
   const rpc = useRPC();
   const [web3, setWeb3] = useState(null); // Web3 provider
-  const [modal, setModal] = useState(null); // Web3Modal
   const [address, setAddress] = useState(null); // ETH address
-
-  /**
-   * Sets up web3Modal and saves to state
-   */
-  const setupWeb3Modal = () => {
-    // Create new web3Modal
-    const web3Modal = new Web3Modal({
-      network: "mainnet",
-      cacheProvider: true,
-      providerOptions: providerOptions,
-    });
-
-    // Set web3Modal
-    setModal(web3Modal);
-  };
 
   /**
    * Authenticate, save web3 provider, and save eth address
    */
   const authenticate = async () => {
-    // Toggle modal
     let provider;
+    // Toggle modal
     if (!embedded) {
-      provider = await modal.connect();
+      // EthereumProvider provider options (triggers WalletConnectModal)
+      provider = await EthereumProvider.init({
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID,
+        chains: [1], // mainnet
+        showQrModal: true, // prompts modal using @walletconnect/modal
+        methods: ["eth_signTypedData_v4"],
+      });
+      await provider.enable();
     } else {
       provider = new RPCWeb3Provider(rpc.sendRPC);
     }
@@ -90,10 +69,7 @@ function useWeb3() {
 
   // On mount
   useEffect(() => {
-    // Setup web3modal
-    if (!embedded) {
-      setupWeb3Modal();
-    } else {
+    if (embedded) {
       authenticate();
     }
   }, []);
