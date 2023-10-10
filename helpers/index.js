@@ -79,6 +79,46 @@ const createVoteBySigMessage = (proposalId, support) => {
 };
 
 /**
+ * Generate vote with reason message
+ * @param {Number} proposalId for Compound Governance proposal
+ * @param {boolean} support for or against
+ * @param {String} reason reason given by voter for the vote
+ */
+const createVoteWithReasonBySigMessage = (proposalId, support, reason) => {
+  // Types
+  const types = {
+    EIP712Domain: [
+      { name: "name", type: "string" },
+      { name: "chainId", type: "uint256" },
+      { name: "verifyingContract", type: "address" },
+    ],
+    Ballot: [
+      { name: "proposalId", type: "uint256" },
+      { name: "support", type: "uint8" },
+      { name: "reason", type: "string"}
+    ],
+  };
+
+  // Return message to sign
+  return {
+    types,
+    primaryType: "Ballot",
+    // Compound Governor contract
+    domain: {
+      name: "Compound Governor Bravo",
+      chainId: 1,
+      verifyingContract: "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
+    },
+    // Message
+    message: {
+      proposalId,
+      support,
+      reason
+    },
+  };
+};
+
+/**
  * Generate delegation message
  * @param {string} delegatee address to delegate voting power to
  * @param {integer} nonce transaction nonce
@@ -334,11 +374,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
     throw error;
   }
 
-  if (v == "0x00" || v == "0x01") {
-    const error = new Error("invalid signature v input");
-    error.code = 422;
-    throw error;
-  }
+  _checkV(v);
 
   // Force address formatting
   address = address.toString().toLowerCase();
@@ -404,6 +440,96 @@ const vote = async (address, proposalId, support, v, r, s) => {
 };
 
 /**
+ * Validates the given vote with reason by sig data and saves it to the database
+ * @param {String} address that created the signature
+ * @param {Number} proposalId to vote on
+ * @param {bool} support
+ * @param {String} reason 
+ * @param {String} v
+ * @param {String} r
+ * @param {String} s
+ */
+const voteWithReason = async (address, proposalId, support, reason, v, r, s) => {
+  // Check for undefined inputs
+  if ([address, proposalId, support, reason, v, r, s].includes(undefined)) {
+    const error = new Error("invalid input");
+    error.code = 422;
+    throw error;
+  }
+
+  if (support > 2) {
+    const error = new Error("invalid support value");
+    error.code = 422;
+    throw error;
+  }
+
+  _checkV(v);
+
+  // Force address formatting
+  address = address.toString().toLowerCase();
+
+  // Address verified used to create signature
+  let sigAddress;
+  const data = createVoteWithReasonBySigMessage(proposalId, support, reason);
+  try {
+    sigAddress = await recoverTypedSignature({
+      data: data,
+      signature: r + s.substring(2) + v.substring(2),
+      version: "V4",
+    });
+  } catch (err) {
+    const newErr = new Error("invalid signature");
+    newErr.code = 422;
+    throw newErr;
+  }
+
+  // Force address formatting
+  sigAddress = sigAddress.toString().toLowerCase();
+
+  // Address verified to create sig and alleged must match
+  if (address.localeCompare(sigAddress) != 0) {
+    const error = new Error("invalid signature");
+    error.code = 422;
+    throw error;
+  }
+
+  try {
+    await canVote(address, proposalId);
+  } catch (error) {
+    // Pass error from db
+    if (typeof error.code == "number") {
+      throw error;
+    }
+    // Else, send error from database
+    const newError = new Error("error fetching data from blockchain");
+    newError.code = 500;
+    throw newError;
+  }
+
+  // Create new transactions
+  const newTx = {
+    from: address,
+    v,
+    r,
+    s,
+    support,
+    proposalId,
+    reason,
+    type: "voteWithReason",
+    createdAt: new Date(),
+    executed: false,
+  };
+
+  // Insert vote transaction to db
+  await insertVoteTx(newTx);
+
+  // Send notification to admin using telegram
+  if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
+  }
+};
+
+/**
  * Validates the given delegate by sig data and saves it to the database
  * @param {String} address that created the signature
  * @param {String} delegatee to delegate to
@@ -420,6 +546,8 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
     error.code = 422;
     throw error;
   }
+
+  _checkV();
 
   // Force address formatting
   address = address.toString().toLowerCase();
@@ -499,6 +627,8 @@ const propose = async (targets, values, signatures, calldatas, description, prop
     error.code = 422;
     throw error;
   }
+
+  _checkV(v);
 
   // Address verified used to create signature
   let sigAddress;
@@ -593,9 +723,17 @@ const createProposeBySigMessage = (targets, values, signatures, calldatas, descr
   };
 }
 
+function _checkV(v) {
+  if (v == "0x00" || v == "0x01") {
+    const error = new Error("invalid signature v input");
+    error.code = 422;
+    throw error;
+  }
+}
+
 const getPendingTransactions = async () => {
   return await pendingTransactions();
 };
 
 // Export functions
-export { canDelegate, canPropose, canVote, vote, delegate, getPendingTransactions };
+export { canDelegate, canPropose, canVote, vote, voteWithReason, delegate, propose, getPendingTransactions };
