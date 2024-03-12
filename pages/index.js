@@ -259,7 +259,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
 export async function getServerSideProps() {
   // Collect first page data
   const firstPage =
-    "https://v3-api.compound.finance/governance/mainnet/all/proposals?page_size=10";
+    "https://comp-vote-git-feat-governance-proposals-api-comp-vote1.vercel.app/api/governance/proposals?page_size=10&get_state_times=true&page_number=1";
   const response = await axios.get(firstPage);
 
   // Return:
