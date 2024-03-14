@@ -159,7 +159,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                 <div>
                   {/* Truncated proposal name */}
                   <h4>
-                    {proposal.title.split(" ").splice(0, 10).join(" ")}
+                    {proposal.title.split(" ").splice(0, 9).join(" ")}
                     {proposal.title.split(" ").length > 10 ? "..." : ""}
                   </h4>
 
