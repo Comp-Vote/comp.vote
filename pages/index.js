@@ -77,7 +77,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
     setLoading(true);
 
     // Collect next page request string and request
-    const nextPage = `https://comp.vote/api/governance/proposals?page_size=10&get_state_times=true&page_number${
+    const nextPage = `/api/governance/proposals?page_size=10&get_state_times=true&page_number=${
       pages.current + 1
     }`;
     const response = await axios.get(nextPage);
@@ -95,20 +95,6 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
 
     // Toggle loading state
     setLoading(false);
-  };
-
-  /**
-   * Opens Compoung Governance proposal information in new tab
-   * @param {Number} proposalId for Compound governance proposal
-   */
-  const proposalInfo = (proposalId) => {
-    // Navigate
-    window.open(
-      // With target set to Compound governance proposal
-      `https://compound.finance/governance/proposals/${proposalId}`,
-      // In new tab
-      "_blank"
-    );
   };
 
   /**
