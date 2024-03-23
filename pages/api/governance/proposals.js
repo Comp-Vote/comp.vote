@@ -125,7 +125,7 @@ export default async (req, res) => {
       MISFORMATTED_PROPOSAL_TITLES[proposal.id] ??
       proposal.description.split("\n")[0].substring(2);
     newProposal.id = proposal.id;
-    newProposal.uniswap_url = `https://compound.finance/governance/proposals/${proposal.id}?target_network=mainnet`;
+    newProposal.compound_url = `https://compound.finance/governance/proposals/${proposal.id}?target_network=mainnet`;
 
     const currentState = stringStates.shift();
     let time = null;

@@ -165,14 +165,9 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
 
                   {/* Proposal ID + Status + Status update date */}
                   <span>
-                    {proposal.id} •{" "}
-                    {firstUppercase(
-                      proposal.states[proposal.states.length - 1].state
-                    )}{" "}
+                    {proposal.id} • {firstUppercase(proposal.state.value)}{" "}
                     {dayjs
-                      .unix(
-                        proposal.states[proposal.states.length - 1].start_time
-                      )
+                      .unix(proposal.state.start_time)
                       .format("MMMM D, YYYY")}
                   </span>
                 </div>
@@ -180,15 +175,21 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                 {/* Proposal actions */}
                 <div>
                   <button
-                    onClick={() => proposalInfo(proposal.id)}
+                    onClick={() => {
+                      console.log(proposal);
+                      window.open(
+                        // With target set to Compound governance proposal
+                        proposal.compound_url,
+                        // In new tab
+                        "_blank"
+                      );
+                    }}
                     className={styles.info}
                   >
                     Info
                   </button>
-                  {proposal.states[proposal.states.length - 1].state ===
-                    "active" ||
-                  proposal.states[proposal.states.length - 1].state ===
-                    "pending" ? (
+                  {proposal.state.value === "Active" ||
+                  proposal.state.value === "Pending" ? (
                     // Check if proposal is active
                     web3 ? (
                       // If authenticated and proposal active, return voting + info buttons
