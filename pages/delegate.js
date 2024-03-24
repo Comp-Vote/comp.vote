@@ -30,7 +30,10 @@ export default function Delegate({
     setLoading(true);
 
     // Collect next page request string and request
-    const nextPage = `https://v3-api.compound.finance/governance/mainnet/comp/accounts?page_size=10&with_details=false&page_number=${pages.current + 1}`;
+
+    const nextPage = `api/governance/accounts?page_size=10&page_number=${
+      pages.current + 1
+    }`;
     const response = await axios.get(nextPage);
 
     // Update proposals array with new proposals
@@ -90,8 +93,8 @@ export default function Delegate({
             <div>
               <h2>
                 <a
-                  // Link to Compound Governance profile
-                  href={`https://compound.finance/governance/address/${currentDelegate}?target_network=mainnet`}
+                  // Link to Compound Governance profile on tally
+                  href={`https://www.tally.xyz/gov/compound/delegate/${currentDelegate}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -121,7 +124,6 @@ export default function Delegate({
             <div className={styles.legend}>
               <span>Rank</span>
               <span>Vote Weight</span>
-              <span>Proposals Voted</span>
             </div>
 
             {/* Card delegates content */}
@@ -153,8 +155,12 @@ export default function Delegate({
                     {/* Delegate name */}
                     <div>
                       <a
-                        // Link name to Etherscan address
-                        href={`https://etherscan.io/address/${delegate.address}`}
+                        // Link name to Twitter or Etherscan if no twitter
+                        href={
+                          !!delegate.twitter && delegate.twitter != ""
+                            ? `https://twitter.com/${delegate.twitter}`
+                            : `https://etherscan.io/address/${delegate.address}`
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -302,12 +308,20 @@ export default function Delegate({
 
 export async function getServerSideProps() {
   // Collect first page data
-  const firstPage = `https://v3-api.compound.finance/governance/mainnet/comp/accounts?page_size=10&with_details=false`;
+  const firstPage =
+    "https://comp.vote/api/governance/accounts?page_size=10&page_number=1";
   const response = await axios.get(firstPage);
 
   // Collect delegated vote count
-  const historyURL = `https://v3-api.compound.finance/governance/mainnet/comp/history`;
-  const historyResponse = await axios.get(historyURL);
+  const historyURL =
+    "hhttps://api.thegraph.com/subgraphs/name/arr00/compound-governance-2";
+  const historyResponse = await axios.post(historyURL, {
+    query: `{
+  governance(id:"GOVERNANCE"){
+    delegatedVotes
+  }
+}`,
+  });
 
   // Return:
   return {
@@ -316,10 +330,14 @@ export async function getServerSideProps() {
       defaultAccounts: response.data.accounts,
       defaultPages: {
         // Current paginated proposal page (default: 1)
-        current: 1,
+        current: response.data.pagination_summary.page_number,
+        // Maximum number of paginated proposal pages
+        max: response.data.pagination_summary.total_pages,
       },
       // Total delegated vote count
-      defaultDelegated: parseFloat(historyResponse.data.votes_delegated),
+      defaultDelegated: parseFloat(
+        historyResponse.data.data.governance.delegatedVotes
+      ),
     },
   };
 }
