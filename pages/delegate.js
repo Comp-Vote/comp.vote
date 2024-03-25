@@ -124,6 +124,7 @@ export default function Delegate({
             <div className={styles.legend}>
               <span>Rank</span>
               <span>Vote Weight</span>
+              <span>Proposals Voted</span>
             </div>
 
             {/* Card delegates content */}
