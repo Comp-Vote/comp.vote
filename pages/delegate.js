@@ -310,12 +310,12 @@ export default function Delegate({
 export async function getServerSideProps() {
   // Collect first page data
   const firstPage =
-    "https://comp.vote/api/governance/accounts?page_size=10&page_number=1";
+    `https://${process.env.VERCEL_URL}/api/governance/accounts?page_size=10&page_number=1`;
   const response = await axios.get(firstPage);
 
   // Collect delegated vote count
   const historyURL =
-    "hhttps://api.thegraph.com/subgraphs/name/arr00/compound-governance-2";
+    "https://api.thegraph.com/subgraphs/name/arr00/compound-governance-2";
   const historyResponse = await axios.post(historyURL, {
     query: `{
   governance(id:"GOVERNANCE"){
