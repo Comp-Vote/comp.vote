@@ -24,11 +24,12 @@ export default async (req, res) => {
         `{
 					delegates(first:` +
         page_size +
-        `, orderBy:delegatedVotes, orderDirection:desc, skip:` +
+        `, orderBy:numberVotes, orderDirection:desc, skip:` +
         offset +
         `) {
 						id
 						delegatedVotes
+            numberVotes
 					}
 				}`,
     }
@@ -76,6 +77,7 @@ export default async (req, res) => {
 
     let a = {};
     a.address = graphAccount.id;
+    a.proposals_voted = graphAccount.numberVotes;
     a.votes = graphAccount.delegatedVotes;
     a.image_url = tallyAccount.picture || "";
     a.display_name = tallyAccount.name || tallyAccount.ens || tallyAccount.twitter;
