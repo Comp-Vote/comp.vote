@@ -18,7 +18,7 @@ export default async (req, res) => {
 
   // Fetch top delegates from the graph
   const graphRes = await axios.post(
-    "https://api.thegraph.com/subgraphs/name/arr00/compound-governance-2",
+    `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`,
     {
       query:
         `{
@@ -80,7 +80,8 @@ export default async (req, res) => {
     a.proposals_voted = graphAccount.numberVotes;
     a.votes = graphAccount.delegatedVotes;
     a.image_url = tallyAccount.picture || "";
-    a.display_name = tallyAccount.name || tallyAccount.ens || tallyAccount.twitter;
+    a.display_name =
+      tallyAccount.name || tallyAccount.ens || tallyAccount.twitter;
     a.twitter = tallyAccount.twitter || "";
     a.rank = Number(x) + offset + 1;
 

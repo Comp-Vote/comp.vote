@@ -74,14 +74,14 @@ export default async (req, res) => {
   pagination_summary.total_entries = proposalCount;
   resData.pagination_summary = pagination_summary;
 
-  if(initialProposalBravo > proposalCount - offset - page_size) {
+  if (initialProposalBravo > proposalCount - offset - page_size) {
     res.status(500).send("Does not support proposal ids less than 42");
     return;
   }
 
   [graphRes, states] = await Promise.all([
     axios.post(
-      "https://api.thegraph.com/subgraphs/name/arr00/compound-governance-2",
+      `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`,
       {
         query:
           `{
