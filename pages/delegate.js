@@ -318,8 +318,7 @@ export async function getServerSideProps() {
   const response = await axios.get(firstPage);
 
   // Collect delegated vote count
-  const historyURL =
-    "https://api.thegraph.com/subgraphs/name/arr00/compound-governance-2";
+  const historyURL = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`;
   const historyResponse = await axios.post(historyURL, {
     query: `{
   governance(id:"GOVERNANCE"){
