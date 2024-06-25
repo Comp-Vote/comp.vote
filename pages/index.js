@@ -245,8 +245,13 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
 
 export async function getServerSideProps() {
   // Collect first page data
+  const deployedUrl =
+    process.env.VERCEL_URL == "localhost:3000"
+      ? `http://${process.env.VERCEL_URL}`
+      : `https://${process.env.VERCEL_URL}`;
   const firstPage =
-    "https://comp.vote/api/governance/proposals?page_size=10&get_state_times=true&page_number=1";
+    deployedUrl +
+    "/api/governance/proposals?page_size=10&get_state_times=true&page_number=1";
   const response = await axios.get(firstPage);
 
   // Return:

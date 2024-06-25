@@ -309,8 +309,12 @@ export default function Delegate({
 
 export async function getServerSideProps() {
   // Collect first page data
+  const deployedUrl =
+    process.env.VERCEL_URL == "localhost:3000"
+      ? `http://${process.env.VERCEL_URL}`
+      : `https://${process.env.VERCEL_URL}`;
   const firstPage =
-    `https://${process.env.VERCEL_URL}/api/governance/accounts?page_size=10&page_number=1`;
+    deployedUrl + "/api/governance/accounts?page_size=10&page_number=1";
   const response = await axios.get(firstPage);
 
   // Collect delegated vote count
