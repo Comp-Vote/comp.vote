@@ -525,7 +525,7 @@ const voteWithReason = async (address, proposalId, support, reason, v, r, s) => 
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
-    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
+    await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig with reason");
   }
 };
 
@@ -667,13 +667,15 @@ const propose = async (targets, values, signatures, calldatas, description, prop
     throw error;
   }
 
+  const gas = await governorBravo.methods.proposeBySig(targets, values, signatures, calldatas, description, proposalId, v, r, s).estimateGas({from: sigAddress});
+
   // create relay client
   const relayer = new Relayer({ apiKey: process.env.RELAY_API_KEY, apiSecret: process.env.RELAY_API_SECRET });
   const tx = {
     to: governorBravo.address,
     value: 0,
     data: await governorBravo.methods.proposeBySig(targets, values, signatures, calldatas, description, proposalId, v, r, s).encodeABI(),
-    gasLimit: 200000,
+    gasLimit: gas + 100000 /* add a 100k gas buffer */,
     maxFeePerGas: "100000000000",
     maxPriorityFeePerGas: "1000000000"
   }
