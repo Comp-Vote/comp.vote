@@ -20,7 +20,9 @@ const statesKey = [
 ];
 
 /// Global defining titles for misformatted proposals
-const MISFORMATTED_PROPOSAL_TITLES = {};
+const MISFORMATTED_PROPOSAL_TITLES = {
+  380: "[Gauntlet] Supply Cap Recommendations (12/09/24)",
+};
 
 /**
  * Instantiates server-side web3 connection
