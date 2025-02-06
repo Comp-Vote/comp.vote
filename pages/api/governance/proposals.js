@@ -66,7 +66,9 @@ export default async (req, res) => {
   let pagination_summary = {};
 
   pagination_summary.page_number = Number(page_number);
-  pagination_summary.total_pages = Math.ceil(proposalCountMinusAlpha / page_size);
+  pagination_summary.total_pages = Math.ceil(
+    proposalCountMinusAlpha / page_size
+  );
 
   if (page_number < 1 || page_number > pagination_summary.total_pages) {
     res.status(400).send("Invalid page number");
@@ -82,14 +84,14 @@ export default async (req, res) => {
     return;
   }
 
-  if(page_number == pagination_summary.total_pages) {
+  if (page_number == pagination_summary.total_pages) {
     // Last page. Modify page size to show all remaining proposals
     page_size = proposalCountMinusAlpha - offset;
   }
 
   [graphRes, states] = await Promise.all([
     axios.post(
-      `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/deployments/id/QmdiapBGreiak5mGBAKFNmuzhDtdUVW88b7BaJSzrfBWXd`,
+      `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`,
       {
         query:
           `{
