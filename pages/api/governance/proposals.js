@@ -2,6 +2,8 @@ import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
 import {
   GOVERNOR_BRAVO_ABI,
+  GOVERNOR_CHARLIE_ABI,
+  GOVERNOR_CHARLIE_ADDRESS,
   GOVERNANCE_ADDRESS,
   MULTICALL_ABI,
   MULTICALL_ADDRESS,
@@ -39,11 +41,20 @@ const Web3Handler = () => {
     GOVERNANCE_ADDRESS
   );
 
+  const governorCharlie = new web3.eth.Contract(
+    GOVERNOR_CHARLIE_ABI,
+    GOVERNOR_CHARLIE_ADDRESS
+  );
+
+  const initialProposalBravo = 42;
+  const initialProposalCharlie = 394;
+
   // Return web3 + contracts
   return {
     web3,
     governance,
     multicall,
+    governorCharlie,
   };
 };
 
@@ -51,10 +62,10 @@ export default async (req, res) => {
   let { page_number = 1, page_size = 10, get_state_times = false } = req.query;
   page_size = Number(page_size);
   page_number = Number(page_number);
-  const { web3, governance, multicall } = Web3Handler();
-  const proposalCount = Number(await governance.methods.proposalCount().call());
-
-  const initialProposalBravo = 43;
+  const { web3, governance, multicall, governorCharlie } = Web3Handler();
+  const proposalCount = Number(
+    await governorCharlie.methods.proposalCount().call()
+  );
   const proposalCountMinusAlpha = proposalCount + 1 - initialProposalBravo;
 
   const offset = (page_number - 1) * page_size;
@@ -114,9 +125,7 @@ export default async (req, res) => {
     ),
     multicall.methods
       .aggregate(
-        genCalls(
-          GOVERNANCE_ADDRESS,
-          "0x3e4f49e6",
+        genStateCalls(
           proposalCount - offset,
           Math.max(initialProposalBravo, proposalCount - offset - page_size),
           web3
@@ -135,7 +144,7 @@ export default async (req, res) => {
       MISFORMATTED_PROPOSAL_TITLES[proposal.id] ??
       proposal.description.split("\n")[0].substring(2);
     newProposal.id = proposal.id;
-    newProposal.compound_url = `https://compound.finance/governance/proposals/${proposal.id}?target_network=mainnet`;
+    newProposal.compound_url = `https://www.tally.xyz/gov/compound/proposal/${proposal.id}?govId=eip155:1:0xc0Da02939E1441F497fd74F78cE7Decb17B66529`;
 
     const currentState = stringStates.shift();
     let time = null;
@@ -150,6 +159,40 @@ export default async (req, res) => {
   resData.proposals = proposalData;
   res.json(resData);
 };
+
+/**
+ * Generate hex calls for fetching the state of a range of proposals. Only support Bravo and Charlie proposals.
+ * @param {Number} last Last proposal id to fetch state for
+ * @param {Number} first First proposal id to fetch state for
+ * @param {Web3} web3 Web3 instance, used for encoding parameters
+ * @returns Array of calls for multicall. Ordered from last to first proposal id.
+ */
+function genStateCalls(last, first, web3) {
+  let res = [];
+  if (last >= initialProposalCharlie) {
+    res.concat(
+      genCalls(
+        GOVERNOR_CHARLIE_ADDRESS,
+        "0x3e4f49e6",
+        last,
+        Math.max(first, initialProposalCharlie),
+        web3
+      )
+    );
+  }
+  if (first < initialProposalCharlie) {
+    res.concat(
+      genCalls(
+        GOVERNANCE_ADDRESS,
+        "0x3e4f49e6",
+        Math.min(last, initialProposalCharlie - 1),
+        first,
+        web3
+      )
+    );
+  }
+  return res;
+}
 
 /**
  * Generate hex calls for a call signature and a range of uint256 parameter input
