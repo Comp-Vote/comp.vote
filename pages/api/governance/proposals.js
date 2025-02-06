@@ -89,7 +89,7 @@ export default async (req, res) => {
 
   [graphRes, states] = await Promise.all([
     axios.post(
-      `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`,
+      `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/deployments/id/QmdiapBGreiak5mGBAKFNmuzhDtdUVW88b7BaJSzrfBWXd`,
       {
         query:
           `{
