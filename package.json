@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "16.x"
+    "node": "20.x"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "NODE_OPTIONS=\"--openssl-legacy-provider\" next dev",
+    "build": "NODE_OPTIONS=\"--openssl-legacy-provider\" next build",
+    "start": "NODE_OPTIONS=\"--openssl-legacy-provider\" next start"
   },
   "dependencies": {
     "@compound-finance/comet-extension": "^0.0.11",
@@ -21,18 +21,15 @@
     "axios": "^0.21.0",
     "dayjs": "^1.9.6",
     "mongodb": "^3.6.3",
-    "next": "10.0.3",
+    "next": "10.2.3",
     "nprogress": "^0.2.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hamburger-menu": "^1.2.1",
-    "react-spinners": "^0.9.0",
+    "react-spinners": "^0.10.2",
     "sass": "^1.29.0",
     "unstated-next": "^1.1.0",
     "web3": "1.7.3",
     "web3modal": "^1.9.2"
-  },
-  "volta": {
-    "node": "16.16.0"
   }
 }

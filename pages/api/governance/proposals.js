@@ -54,7 +54,7 @@ export default async (req, res) => {
   const { web3, governance, multicall } = Web3Handler();
   const proposalCount = Number(await governance.methods.proposalCount().call());
 
-  const initialProposalBravo = 42;
+  const initialProposalBravo = 43;
   const proposalCountMinusAlpha = proposalCount + 1 - initialProposalBravo;
 
   const offset = (page_number - 1) * page_size;
