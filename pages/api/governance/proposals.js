@@ -54,7 +54,8 @@ export default async (req, res) => {
   const { web3, governance, multicall } = Web3Handler();
   const proposalCount = Number(await governance.methods.proposalCount().call());
 
-  const initialProposalBravo = 42;
+  const initialProposalBravo = 43;
+  const proposalCountMinusAlpha = proposalCount + 1 - initialProposalBravo;
 
   const offset = (page_number - 1) * page_size;
   console.log("Offset is " + offset);
@@ -65,7 +66,7 @@ export default async (req, res) => {
   let pagination_summary = {};
 
   pagination_summary.page_number = Number(page_number);
-  pagination_summary.total_pages = Math.ceil(proposalCount / page_size);
+  pagination_summary.total_pages = Math.ceil(proposalCountMinusAlpha / page_size);
 
   if (page_number < 1 || page_number > pagination_summary.total_pages) {
     res.status(400).send("Invalid page number");
@@ -73,12 +74,17 @@ export default async (req, res) => {
   }
 
   pagination_summary.page_size = page_size;
-  pagination_summary.total_entries = proposalCount;
+  pagination_summary.total_entries = proposalCountMinusAlpha;
   resData.pagination_summary = pagination_summary;
 
-  if (initialProposalBravo > proposalCount - offset - page_size) {
-    res.status(500).send("Does not support proposal ids less than 42");
+  if (page_number > pagination_summary.total_pages) {
+    res.status(500).send("Invalid page number");
     return;
+  }
+
+  if(page_number == pagination_summary.total_pages) {
+    // Last page. Modify page size to show all remaining proposals
+    page_size = proposalCountMinusAlpha - offset;
   }
 
   [graphRes, states] = await Promise.all([
