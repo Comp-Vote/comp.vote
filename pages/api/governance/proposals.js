@@ -26,6 +26,9 @@ const MISFORMATTED_PROPOSAL_TITLES = {
   380: "[Gauntlet] Supply Cap Recommendations (12/09/24)",
 };
 
+const initialProposalBravo = 42;
+const initialProposalCharlie = 394;
+
 /**
  * Instantiates server-side web3 connection
  */
@@ -45,9 +48,6 @@ const Web3Handler = () => {
     GOVERNOR_CHARLIE_ABI,
     GOVERNOR_CHARLIE_ADDRESS
   );
-
-  const initialProposalBravo = 42;
-  const initialProposalCharlie = 394;
 
   // Return web3 + contracts
   return {
@@ -69,7 +69,6 @@ export default async (req, res) => {
   const proposalCountMinusAlpha = proposalCount + 1 - initialProposalBravo;
 
   const offset = (page_number - 1) * page_size;
-  console.log("Offset is " + offset);
 
   let graphRes, states;
   let resData = {};
@@ -87,7 +86,8 @@ export default async (req, res) => {
   }
 
   pagination_summary.page_size = page_size;
-  pagination_summary.total_entries = proposalCountMinusAlpha;
+  pagination_summary.total_entries = proposalCount;
+  pagination_summary.total_available_entries = proposalCountMinusAlpha;
   resData.pagination_summary = pagination_summary;
 
   if (page_number > pagination_summary.total_pages) {
@@ -102,7 +102,7 @@ export default async (req, res) => {
 
   [graphRes, states] = await Promise.all([
     axios.post(
-      `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/deployments/id/QmdiapBGreiak5mGBAKFNmuzhDtdUVW88b7BaJSzrfBWXd`,
+      `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GHB6EWsmMXy2AJaCodmK2AmZviitTZf3Tbo8YEfuh6St`,
       {
         query:
           `{
@@ -144,7 +144,7 @@ export default async (req, res) => {
       MISFORMATTED_PROPOSAL_TITLES[proposal.id] ??
       proposal.description.split("\n")[0].substring(2);
     newProposal.id = proposal.id;
-    newProposal.compound_url = `https://www.tally.xyz/gov/compound/proposal/${proposal.id}?govId=eip155:1:0xc0Da02939E1441F497fd74F78cE7Decb17B66529`;
+    newProposal.tally_url = `https://www.tally.xyz/gov/compound/proposal/${proposal.id}?govId=eip155:1:0xc0Da02939E1441F497fd74F78cE7Decb17B66529`;
 
     const currentState = stringStates.shift();
     let time = null;
@@ -170,18 +170,18 @@ export default async (req, res) => {
 function genStateCalls(last, first, web3) {
   let res = [];
   if (last >= initialProposalCharlie) {
-    res.concat(
+    res = res.concat(
       genCalls(
         GOVERNOR_CHARLIE_ADDRESS,
         "0x3e4f49e6",
         last,
-        Math.max(first, initialProposalCharlie),
+        Math.max(first, initialProposalCharlie - 1),
         web3
       )
     );
   }
   if (first < initialProposalCharlie) {
-    res.concat(
+    res = res.concat(
       genCalls(
         GOVERNANCE_ADDRESS,
         "0x3e4f49e6",

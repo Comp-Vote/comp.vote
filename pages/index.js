@@ -164,8 +164,8 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                     onClick={() => {
                       console.log(proposal);
                       window.open(
-                        // With target set to Compound governance proposal
-                        proposal.compound_url,
+                        // With target set to Compound governance proposal on tally
+                        proposal.tally_url,
                         // In new tab
                         "_blank"
                       );
