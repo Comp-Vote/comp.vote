@@ -144,7 +144,13 @@ export default async (req, res) => {
       MISFORMATTED_PROPOSAL_TITLES[proposal.id] ??
       proposal.description.split("\n")[0].substring(2);
     newProposal.id = proposal.id;
-    newProposal.tally_url = `https://www.tally.xyz/gov/compound/proposal/${proposal.id}?govId=eip155:1:0xc0Da02939E1441F497fd74F78cE7Decb17B66529`;
+    newProposal.tally_url = `https://www.tally.xyz/gov/compound/proposal/${
+      proposal.id
+    }?govId=eip155:1:${
+      proposal.id >= initialProposalCharlie
+        ? "0x309a862bbC1A00e45506cB8A802D1ff10004c8C0"
+        : "0xc0Da02939E1441F497fd74F78cE7Decb17B66529"
+    }`;
 
     const currentState = stringStates.shift();
     let time = null;
