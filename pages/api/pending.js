@@ -17,7 +17,7 @@ export default async (req, res) => {
     return;
   }
 
-  const { web3, multicall, compToken, governorBravo } = await Web3Handler();
+  const { web3, multicall, compToken, governorCharlie } = await Web3Handler();
 
   const currentBlock = await web3.eth.getBlockNumber();
 
@@ -25,9 +25,9 @@ export default async (req, res) => {
     pendingTransactions.map(async (tx) => {
       if (tx.type !== "vote") return null;
       return Object.assign({}, tx, {
-        startBlock: (
-          await governorBravo.methods.proposals(tx.proposalId).call()
-        ).startBlock,
+        startBlock: await governorCharlie.methods
+          .proposalDeadline(tx.proposalId)
+          .call(),
       });
     })
   );

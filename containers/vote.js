@@ -1,8 +1,8 @@
 import axios from "axios"; // Axios requests
 import { web3p } from "containers"; // Web3
 import { createContainer } from "unstated-next"; // Unstated-next containerization
+import { GOVERNOR_CHARLIE_ADDRESS, GOVERNOR_CHARLIE_ABI } from "helpers/abi";
 
-// Reference implementation: https://github.com/TennisBowling/comp.vote/blob/master/bySig/vote_by_signature.html
 function useVote() {
   // Context
   const { web3, address } = web3p.useContainer();
@@ -11,18 +11,30 @@ function useVote() {
    * Generate voting message
    * @param {Number} proposalId for Compound Governance proposal
    * @param {boolean} support for or against
+   * @param {string} voter address of the voter signing the message
    */
-  const createVoteBySigMessage = (proposalId, support) => {
+  const createVoteBySigMessage = async (proposalId, support) => {
+    // Fetch unused nonce
+    const governorCharlie = new web3.eth.Contract(
+      GOVERNOR_CHARLIE_ABI,
+      GOVERNOR_CHARLIE_ADDRESS
+    );
+
+    const nonce = await governorCharlie.methods.nonces(address).call();
+
     // Types
     const types = {
       EIP712Domain: [
         { name: "name", type: "string" },
+        { name: "version", type: "string" },
         { name: "chainId", type: "uint256" },
         { name: "verifyingContract", type: "address" },
       ],
       Ballot: [
         { name: "proposalId", type: "uint256" },
         { name: "support", type: "uint8" },
+        { name: "voter", type: "address" },
+        { name: "nonce", type: "uint256" },
       ],
     };
 
@@ -32,14 +44,17 @@ function useVote() {
       primaryType: "Ballot",
       // Compound Governor contract
       domain: {
-        name: "Compound Governor Bravo",
+        name: "Compound Governor",
+        version: "1",
         chainId: 1,
-        verifyingContract: "0xc0Da02939E1441F497fd74F78cE7Decb17B66529",
+        verifyingContract: GOVERNOR_CHARLIE_ADDRESS,
       },
       // Message
       message: {
         proposalId,
         support: support,
+        voter: address,
+        nonce,
       },
     });
   };
@@ -77,7 +92,7 @@ function useVote() {
    */
   const voteFor = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, 1);
+    const msgParams = await createVoteBySigMessage(proposalId, 1);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
@@ -86,11 +101,11 @@ function useVote() {
 
   /**
    * Generate an AGAINST vote for the proposalId
-   * @param {Number} proposalId of compund governance proposal
+   * @param {Number} proposalId of Compound governance proposal
    */
   const voteAgainst = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, 0);
+    const msgParams = await createVoteBySigMessage(proposalId, 0);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
@@ -99,11 +114,11 @@ function useVote() {
 
   /**
    * Generate an ABSTAIN vote for the proposalId
-   * @param {Number} proposalId of compund governance proposal
+   * @param {Number} proposalId of Compound governance proposal
    */
   const voteAbstain = async (proposalId) => {
     // Generate and sign message
-    const msgParams = createVoteBySigMessage(proposalId, 2);
+    const msgParams = await createVoteBySigMessage(proposalId, 2);
     const signedMsg = await signVote(msgParams);
 
     // POST vote to server
@@ -147,7 +162,7 @@ function useVote() {
   return {
     voteFor,
     voteAgainst,
-    voteAbstain
+    voteAbstain,
   };
 }
 
