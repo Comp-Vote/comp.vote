@@ -7,7 +7,6 @@ export default async (req, res) => {
   let pendingTransactions;
 
   try {
-    // Check if address can vote for proposalId
     pendingTransactions = await getPendingTransactions();
   } catch (error) {
     // Check for error
@@ -26,7 +25,7 @@ export default async (req, res) => {
       if (tx.type !== "vote") return null;
       return Object.assign({}, tx, {
         startBlock: await governorCharlie.methods
-          .proposalDeadline(tx.proposalId)
+          .proposalSnapshot(tx.proposalId)
           .call(),
       });
     })

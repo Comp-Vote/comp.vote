@@ -102,18 +102,33 @@ const voteAllowed = async (address, proposalId) => {
 /**
 
  */
- const pendingTransactions = async () => {
+const pendingTransactions = async () => {
   // Collect database connection
   const { db } = await connectToDatabase();
 
-  const pendingTxs = await db.find({executed:false}).toArray();
+  const pendingTxs = await db.find({ executed: false }).toArray();
   pendingTxs.forEach((tx) => {
     delete tx._id;
     delete tx.executed;
     delete tx.createdAt;
   });
   return pendingTxs;
- }
+};
+
+const votes = async (proposalId = 0, address = null) => {
+  const { db } = await connectToDatabase();
+
+  const query = { type: "vote" };
+  if (proposalId > 0) query.proposalId = proposalId;
+  if (address) query.from = address;
+  const votes = await db.find(query);
+  votes.forEach((tx) => {
+    delete tx._id;
+    delete tx.executed;
+    delete tx.createdAt;
+  });
+  return votes;
+};
 
 // Export functions
 export {
@@ -121,5 +136,6 @@ export {
   insertVoteTx,
   delegationAllowed,
   voteAllowed,
-  pendingTransactions
+  pendingTransactions,
+  votes,
 };
