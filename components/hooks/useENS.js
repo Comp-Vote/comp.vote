@@ -1,4 +1,4 @@
-import { getDefaultProvider } from "@ethersproject/providers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { useEffect, useState } from "react";
 
 const useENS = (address) => {
@@ -7,7 +7,9 @@ const useENS = (address) => {
   useEffect(() => {
     const resolveENS = async () => {
       if (address) {
-        const provider = getDefaultProvider();
+        const provider = new JsonRpcProvider(
+          process.env.NEXT_PUBLIC_INFURA_RPC
+        );
         const ensName = await provider.lookupAddress(address);
         setENSName(ensName);
       }
