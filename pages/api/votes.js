@@ -13,7 +13,7 @@ export default async (req, res) => {
   try {
     fetchedTransactions = await getVotes(proposalId, address);
   } catch (error) {
-    res.status(error.code).send({
+    res.status(error.code ?? 500).send({
       message: error.message,
     });
     return;
