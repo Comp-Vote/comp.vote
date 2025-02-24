@@ -5,6 +5,11 @@ export default async (req, res) => {
   const { address, proposalId } = req.query;
   let fetchedTransactions;
 
+  if (!proposalId && !address) {
+    res.status(400).send("proposalId or address required");
+    return;
+  }
+
   try {
     fetchedTransactions = await getVotes(proposalId, address);
   } catch (error) {

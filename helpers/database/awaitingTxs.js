@@ -115,12 +115,12 @@ const pendingTransactions = async () => {
   return pendingTxs;
 };
 
-const votes = async (proposalId = 0, address = null) => {
+const votes = async () => {
   const { db } = await connectToDatabase();
 
   const query = { type: "vote" };
-  if (proposalId > 0) query.proposalId = proposalId;
-  if (address) query.from = address;
+  if (!!proposalId && proposalId > 0) query.proposalId = proposalId;
+  if (!!address) query.from = address;
   const votes = await db.find(query);
   votes.forEach((tx) => {
     delete tx._id;
