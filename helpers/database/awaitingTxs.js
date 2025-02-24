@@ -115,7 +115,7 @@ const pendingTransactions = async () => {
   return pendingTxs;
 };
 
-const votes = async () => {
+const votes = async (proposalId, address) => {
   const { db } = await connectToDatabase();
 
   const query = { type: "vote" };
