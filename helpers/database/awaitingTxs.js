@@ -88,12 +88,12 @@ const voteAllowed = async (address, proposalId) => {
 
   // Collect existing user transactions
   const existingUserTxs = await db
-    .find({ from: address, proposalId: proposalId, type: "vote" })
+    .find({ from: address, executed: false, type: "vote" })
     .toArray();
 
   // If existing transactions, throw error
   if (existingUserTxs.length > 0) {
-    const error = new Error("user already voted for this proposal");
+    const error = new Error("only one pending vote at a time");
     error.code = 409;
     throw error;
   }
@@ -102,18 +102,18 @@ const voteAllowed = async (address, proposalId) => {
 /**
 
  */
- const pendingTransactions = async () => {
+const pendingTransactions = async () => {
   // Collect database connection
   const { db } = await connectToDatabase();
 
-  const pendingTxs = await db.find({executed:false}).toArray();
+  const pendingTxs = await db.find({ executed: false }).toArray();
   pendingTxs.forEach((tx) => {
     delete tx._id;
     delete tx.executed;
     delete tx.createdAt;
   });
   return pendingTxs;
- }
+};
 
 // Export functions
 export {
@@ -121,5 +121,5 @@ export {
   insertVoteTx,
   delegationAllowed,
   voteAllowed,
-  pendingTransactions
+  pendingTransactions,
 };
