@@ -535,8 +535,8 @@ const getPendingTransactions = async () => {
   return await pendingTransactions();
 };
 
-const getVotes = async (proposalId, address) => {
-  return await votes(proposalId, address);
+const getVotes = async (proposalId, address, executed) => {
+  return await votes(proposalId, address, executed);
 };
 
 // Export functions

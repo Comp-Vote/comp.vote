@@ -2,7 +2,7 @@ import { getVotes } from "helpers"; // canVote helper
 
 export default async (req, res) => {
   // Collect address and proposalId
-  const { address, proposalId } = req.query;
+  const { address, proposalId, executed } = req.query;
   let fetchedTransactions;
 
   if (!proposalId && !address) {
@@ -11,7 +11,7 @@ export default async (req, res) => {
   }
 
   try {
-    fetchedTransactions = await getVotes(proposalId, address);
+    fetchedTransactions = await getVotes(proposalId, address, executed);
   } catch (error) {
     res.status(error.code ?? 500).send({
       message: error.message,
