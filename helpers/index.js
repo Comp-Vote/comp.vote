@@ -14,6 +14,7 @@ import {
   delegationAllowed,
   voteAllowed,
   pendingTransactions,
+  votes,
 } from "helpers/database/awaitingTxs"; // Database helper functions
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
@@ -534,6 +535,10 @@ const getPendingTransactions = async () => {
   return await pendingTransactions();
 };
 
+const getVotes = async (proposalId, address, executed) => {
+  return await votes(proposalId, address, executed);
+};
+
 // Export functions
 export {
   canDelegate,
@@ -542,4 +547,5 @@ export {
   vote,
   delegate,
   getPendingTransactions,
+  getVotes,
 };
