@@ -91,8 +91,12 @@ const voteAllowed = async (address, proposalId) => {
     .find({ from: address, executed: false, type: "vote" })
     .toArray();
 
+  const existingVoteForProposal = await db
+    .find({ from: address, proposalId, type: "vote" })
+    .toArray();
+
   // If existing transactions, throw error
-  if (existingUserTxs.length > 0) {
+  if (existingUserTxs.length > 0 || existingVoteForProposal > 0) {
     const error = new Error("only one pending vote at a time");
     error.code = 409;
     throw error;

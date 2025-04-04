@@ -16,9 +16,10 @@ export default async (req, res) => {
       vInput = transaction.v;
   }
 
+  let txHash;
   try {
     // Send vote
-    await vote(
+    txHash = await vote(
       transaction.address,
       transaction.proposalId,
       transaction.support,
@@ -35,5 +36,7 @@ export default async (req, res) => {
   }
 
   // Else, return success
-  res.status(200).end();
+  res.status(200).send({
+    txHash,
+  });
 };

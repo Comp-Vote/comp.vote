@@ -19,7 +19,7 @@ import {
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
 import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig verification
-import { Relayer } from "@openzeppelin/defender-relay-client";
+import { Relayer } from "defender-relay-client";
 
 /**
  * Instantiates server-side web3 connection
@@ -422,16 +422,46 @@ const vote = async (address, proposalId, support, v, r, s) => {
     proposalId,
     type: "vote",
     createdAt: new Date(),
-    executed: false,
+    executed: true, // will relay immediately
   };
 
   // Insert vote transaction to db
   await insertVoteTx(newTx);
 
+  // Relay TX
+  const txHash = await relayVote(newTx);
+
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
     await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
   }
+
+  return txHash;
+};
+
+const relayVote = async (voteSignature) => {
+  const { governorCharlie } = Web3Handler();
+
+  const relayer = new Relayer({
+    apiKey: process.env.DEFENDER_API_KEY,
+    apiSecret: process.env.DEFENDER_API_SECRET,
+  });
+
+  const tx = {
+    target: GOVERNOR_CHARLIE_ADDRESS,
+    callData: governorCharlie.methods.castVoteBySig(
+      voteSignature.proposalId,
+      voteSignature.support,
+      voteSignature.from,
+      `${voteSignature.r}${voteSignature.s.substring(
+        2
+      )}${voteSignature.v.substring(2)}`
+    ),
+    value: 0,
+  };
+
+  const txHash = (await relayer.sendTransaction(tx)).hash;
+  return txHash;
 };
 
 /**
