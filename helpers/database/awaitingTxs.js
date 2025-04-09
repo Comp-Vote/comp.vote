@@ -81,8 +81,9 @@ const insertVoteTx = async (tx) => {
  * has already submitted a sig for this proposal.
  * @param {String} address
  * @param {Number} proposalId
+ * @param {Number} nonce Nonce to be used
  */
-const voteAllowed = async (address, proposalId) => {
+const voteAllowed = async (address, proposalId, nonce) => {
   // Collect database connection
   const { db } = await connectToDatabase();
 
@@ -95,8 +96,25 @@ const voteAllowed = async (address, proposalId) => {
     .find({ from: address, proposalId, type: "vote" })
     .toArray();
 
-  // If existing transactions, throw error
-  if (existingUserTxs.length > 0 || existingVoteForProposal > 0) {
+  const existingVoteWithNonce = await db
+    .find({ from: address, nonce, type: "vote" })
+    .toArray();
+
+  if (existingVoteForProposal.length > 0) {
+    const error = new Error("user has already voted for this proposal");
+    error.code = 409;
+    throw error;
+  }
+
+  if (existingVoteWithNonce.length > 0) {
+    const error = new Error(
+      "user has already voted with this nonce. Please try again later."
+    );
+    error.code = 409;
+    throw error;
+  }
+
+  if (existingUserTxs.length > 0) {
     const error = new Error("only one pending vote at a time");
     error.code = 409;
     throw error;

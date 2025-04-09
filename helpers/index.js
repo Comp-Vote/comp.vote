@@ -19,7 +19,7 @@ import {
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
 import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig verification
-import { Relayer } from "defender-relay-client";
+import { Defender } from "@openzeppelin/defender-sdk";
 
 /**
  * Instantiates server-side web3 connection
@@ -220,8 +220,9 @@ const canDelegate = async (address, delegatee = "0x") => {
  * Checks if an address can vote by sig for the given proposal
  * @param {String} address
  * @param {Number} proposalId
+ * @param {Number} nonce Nonce to be used for the vote
  */
-const canVote = async (address, proposalId) => {
+const canVote = async (address, proposalId, nonce) => {
   // Collect Web3 + contracts
   const { web3, compToken, governorCharlie } = Web3Handler();
 
@@ -268,7 +269,7 @@ const canVote = async (address, proposalId) => {
         // Collect current block number
         web3.eth.getBlockNumber(),
         // Check if vote is allowed from db
-        voteAllowed(address, proposalId),
+        voteAllowed(address, proposalId, nonce),
       ]);
 
     if (currentBlock >= snapshotBlock) {
@@ -400,7 +401,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   }
 
   try {
-    await canVote(address, proposalId);
+    await canVote(address, proposalId, data.message.nonce);
   } catch (error) {
     // Pass error from db
     if (typeof error.code == "number") {
@@ -422,14 +423,15 @@ const vote = async (address, proposalId, support, v, r, s) => {
     proposalId,
     type: "vote",
     createdAt: new Date(),
-    executed: true, // will relay immediately
+    executed: true, // will relay immediately,
+    nonce: data.message.nonce,
   };
-
-  // Insert vote transaction to db
-  await insertVoteTx(newTx);
 
   // Relay TX
   const txHash = await relayVote(newTx);
+
+  // Insert vote transaction to db
+  await insertVoteTx(newTx);
 
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
@@ -442,26 +444,30 @@ const vote = async (address, proposalId, support, v, r, s) => {
 const relayVote = async (voteSignature) => {
   const { governorCharlie } = Web3Handler();
 
-  const relayer = new Relayer({
-    apiKey: process.env.DEFENDER_API_KEY,
-    apiSecret: process.env.DEFENDER_API_SECRET,
+  const client = new Defender({
+    relayerApiKey: process.env.DEFENDER_API_KEY,
+    relayerApiSecret: process.env.DEFENDER_API_SECRET,
   });
 
+  const web3jsTx = governorCharlie.methods.castVoteBySig(
+    voteSignature.proposalId,
+    voteSignature.support,
+    voteSignature.from,
+    `${voteSignature.r}${voteSignature.s.substring(
+      2
+    )}${voteSignature.v.substring(2)}`
+  );
+
   const tx = {
-    target: GOVERNOR_CHARLIE_ADDRESS,
-    callData: governorCharlie.methods.castVoteBySig(
-      voteSignature.proposalId,
-      voteSignature.support,
-      voteSignature.from,
-      `${voteSignature.r}${voteSignature.s.substring(
-        2
-      )}${voteSignature.v.substring(2)}`
-    ),
+    to: GOVERNOR_CHARLIE_ADDRESS,
+    data: web3jsTx.encodeABI(),
+    gasLimit: Math.round((await web3jsTx.estimateGas()) * 1.2),
     value: 0,
+    maxPriorityFeePerGas: "500000000",
+    maxFeePerGas: "50000000000"
   };
 
-  const txHash = (await relayer.sendTransaction(tx)).hash;
-  return txHash;
+  return (await client.relaySigner.sendTransaction(tx)).hash;
 };
 
 /**
