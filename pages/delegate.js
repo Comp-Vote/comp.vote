@@ -117,7 +117,7 @@ export default function Delegate({
           <div className={styles.card}>
             {/* Card header */}
             <div>
-              <h4>Addresses by Voting Weight</h4>
+              <h4>Addresses by Proposals Voted</h4>
             </div>
 
             {/* Card legend */}

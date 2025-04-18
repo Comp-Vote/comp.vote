@@ -19,7 +19,7 @@ import {
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
 import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig verification
-import { Relayer } from "@openzeppelin/defender-relay-client";
+import { Defender } from "@openzeppelin/defender-sdk";
 
 /**
  * Instantiates server-side web3 connection
@@ -220,8 +220,9 @@ const canDelegate = async (address, delegatee = "0x") => {
  * Checks if an address can vote by sig for the given proposal
  * @param {String} address
  * @param {Number} proposalId
+ * @param {Number} nonce Nonce to be used for the vote
  */
-const canVote = async (address, proposalId) => {
+const canVote = async (address, proposalId, nonce) => {
   // Collect Web3 + contracts
   const { web3, compToken, governorCharlie } = Web3Handler();
 
@@ -268,7 +269,7 @@ const canVote = async (address, proposalId) => {
         // Collect current block number
         web3.eth.getBlockNumber(),
         // Check if vote is allowed from db
-        voteAllowed(address, proposalId),
+        voteAllowed(address, proposalId, nonce),
       ]);
 
     if (currentBlock >= snapshotBlock) {
@@ -400,7 +401,7 @@ const vote = async (address, proposalId, support, v, r, s) => {
   }
 
   try {
-    await canVote(address, proposalId);
+    await canVote(address, proposalId, data.message.nonce);
   } catch (error) {
     // Pass error from db
     if (typeof error.code == "number") {
@@ -422,8 +423,12 @@ const vote = async (address, proposalId, support, v, r, s) => {
     proposalId,
     type: "vote",
     createdAt: new Date(),
-    executed: false,
+    executed: true, // will relay immediately,
+    nonce: data.message.nonce,
   };
+
+  // Relay TX
+  const txHash = await relayVote(newTx);
 
   // Insert vote transaction to db
   await insertVoteTx(newTx);
@@ -432,6 +437,37 @@ const vote = async (address, proposalId, support, v, r, s) => {
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
     await axios.get(process.env.NOTIFICATION_HOOK + "New comp.vote voting sig");
   }
+
+  return txHash;
+};
+
+const relayVote = async (voteSignature) => {
+  const { governorCharlie } = Web3Handler();
+
+  const client = new Defender({
+    relayerApiKey: process.env.DEFENDER_API_KEY,
+    relayerApiSecret: process.env.DEFENDER_API_SECRET,
+  });
+
+  const web3jsTx = governorCharlie.methods.castVoteBySig(
+    voteSignature.proposalId,
+    voteSignature.support,
+    voteSignature.from,
+    `${voteSignature.r}${voteSignature.s.substring(
+      2
+    )}${voteSignature.v.substring(2)}`
+  );
+
+  const tx = {
+    to: GOVERNOR_CHARLIE_ADDRESS,
+    data: web3jsTx.encodeABI(),
+    gasLimit: Math.round((await web3jsTx.estimateGas()) * 1.2),
+    value: 0,
+    maxPriorityFeePerGas: "500000000",
+    maxFeePerGas: "50000000000"
+  };
+
+  return (await client.relaySigner.sendTransaction(tx)).hash;
 };
 
 /**

@@ -174,8 +174,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                   >
                     Info
                   </button>
-                  {proposal.state.value === "Active" ||
-                  proposal.state.value === "Pending" ? (
+                  {proposal.state.value === "Active" ? (
                     // Check if proposal is active
                     web3 ? (
                       // If authenticated and proposal active, return voting + info buttons
