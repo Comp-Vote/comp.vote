@@ -24,6 +24,7 @@ const statesKey = [
 /// Global defining titles for misformatted proposals
 const MISFORMATTED_PROPOSAL_TITLES = {
   380: "[Gauntlet] Supply Cap Recommendations (12/09/24)",
+  450: "OpenZeppelin Security Partnership - Annual Renewal 2025",
 };
 
 const initialProposalBravo = 42;
