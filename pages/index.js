@@ -5,7 +5,7 @@ import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import { web3p, vote } from "containers"; // Context
 import styles from "styles/page.module.scss"; // Page styles
-import BeatLoader from "react-spinners/BeatLoader"; // Loading state
+import { BeatLoader } from "react-spinners"; // Loading state
 import { Embedded } from "containers"; // Embedded
 
 export default function Home(props) {

@@ -4,7 +4,7 @@ import Layout from "components/layout"; // Layout wrapper
 import APICTA from "components/api_cta"; // API CTA
 import styles from "styles/page.module.scss"; // Page styles
 import { web3p, delegate } from "containers"; // Context
-import BeatLoader from "react-spinners/BeatLoader"; // Loading state
+import { BeatLoader } from "react-spinners"; // Loading state
 
 export default function Delegate({
   defaultAccounts,
