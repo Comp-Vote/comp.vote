@@ -148,9 +148,11 @@ function useVote() {
         support,
       })
       // If successful
-      .then(() => {
+      .then((res) => {
         // Alert successful
-        alert("Success!");
+        alert(
+          `Success! View your transaction here https://etherscan.io/tx/${res.data.txHash}`
+        );
       })
       // Else,
       .catch((error) => {
