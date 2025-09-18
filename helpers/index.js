@@ -292,7 +292,7 @@ const canVote = async (address, proposalId, nonce) => {
   }
 
   // Not ongoing proposal. Leaves a block buffer for last relay
-  if (!(currentBlock < endBlock - 2025) || proposalState == 2 /* canceled */) {
+  if (!(currentBlock < endBlock - 100) || proposalState == 2 /* canceled */) {
     const error = new Error("proposal voting period is not active");
     error.code = 400;
     throw error;
