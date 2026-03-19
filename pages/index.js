@@ -56,8 +56,8 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
   const [proposals, setProposals] = useState(defaultProposals); // Proposals array
   const [buttonLoading, setButtonLoading] = useState({ id: null, type: null }); // Current button loading state
 
-  // Web3 + Authenticate function from context
-  const { web3, authenticate } = web3p.useContainer();
+  // Address + Authenticate function from context
+  const { address, authenticate } = web3p.useContainer();
   const { voteFor, voteAgainst, voteAbstain } = vote.useContainer();
 
   /**
@@ -176,7 +176,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                   </button>
                   {proposal.state.value === "Active" ? (
                     // Check if proposal is active
-                    web3 ? (
+                    address ? (
                       // If authenticated and proposal active, return voting + info buttons
                       <>
                         <button
@@ -185,7 +185,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                         >
                           {buttonLoading.id === proposal.id &&
                           buttonLoading.type === 0 ? (
-                            <BeatLoader size={9} />
+                            <BeatLoader size={6} />
                           ) : (
                             "Vote For"
                           )}
@@ -196,7 +196,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                         >
                           {buttonLoading.id === proposal.id &&
                           buttonLoading.type === 1 ? (
-                            <BeatLoader size={9} />
+                            <BeatLoader size={6} />
                           ) : (
                             "Vote Against"
                           )}
@@ -207,7 +207,7 @@ function ProposalsContent({ defaultProposals, pages, setPages }) {
                         >
                           {buttonLoading.id === proposal.id &&
                           buttonLoading.type === 2 ? (
-                            <BeatLoader size={9} />
+                            <BeatLoader size={6} />
                           ) : (
                             "Abstain"
                           )}

@@ -18,8 +18,8 @@ export default function Delegate({
   const [buttonLoading, setButtonLoading] = useState(null); // Delegation button loading state
   const [accounts, setAccounts] = useState(defaultAccounts); // Accounts array
 
-  // Web3 + Authenticate function from context
-  const { web3, address, authenticate, isValidAddress } = web3p.useContainer();
+  // Address + Authenticate function from context
+  const { address, authenticate, isValidAddress } = web3p.useContainer();
   const { currentDelegate, createDelegation } = delegate.useContainer();
 
   /**
@@ -208,7 +208,7 @@ export default function Delegate({
                       <button
                         // If web3 ? delegate function : authenticate state
                         onClick={
-                          web3
+                          address
                             ? () =>
                                 createDelegationWithLoading(
                                   delegate.address,
@@ -218,9 +218,9 @@ export default function Delegate({
                         }
                         className={styles.info}
                       >
-                        {web3 ? (
+                        {address ? (
                           buttonLoading === delegate.rank ? (
-                            <BeatLoader size={9} />
+                            <BeatLoader size={6} />
                           ) : (
                             "Delegate"
                           )
@@ -250,7 +250,7 @@ export default function Delegate({
             </div>
             <div>
               <div className={styles.customDelegate}>
-                {web3 ? (
+                {address ? (
                   <>
                     <input
                       type="text"
@@ -268,7 +268,7 @@ export default function Delegate({
                         className={styles.info}
                       >
                         {buttonLoading === 0 ? (
-                          <BeatLoader size={9} />
+                          <BeatLoader size={6} />
                         ) : (
                           "Delegate"
                         )}
@@ -284,7 +284,7 @@ export default function Delegate({
                       className={styles.info}
                     >
                       {buttonLoading === -1 ? (
-                        <BeatLoader size={9} />
+                        <BeatLoader size={6} />
                       ) : (
                         "Self-delegate"
                       )}
