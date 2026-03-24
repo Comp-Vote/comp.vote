@@ -45,14 +45,12 @@ export default function Header() {
         {/* Logo */}
         <div>
           <Link href={`/`}>
-            <a>
-              <img
-                src="brand/compound-logo.svg"
-                alt="Compound logo"
-                height="30"
-                width="136"
-              />
-            </a>
+            <img
+              src="brand/compound-logo.svg"
+              alt="Compound logo"
+              height="30"
+              width="136"
+            />
           </Link>
         </div>
 
@@ -60,21 +58,21 @@ export default function Header() {
         <div>
           <ul>
             <li>
-              <Link href={`/`}>
-                <a className={router.pathname === "/" ? styles.active : null}>
-                  Vote
-                </a>
+              <Link
+                href={`/`}
+                className={router.pathname === "/" ? styles.active : null}
+              >
+                Vote
               </Link>
             </li>
             <li>
-              <Link href={`/delegate`}>
-                <a
-                  className={
-                    router.pathname === "/delegate" ? styles.active : null
-                  }
-                >
-                  Delegate
-                </a>
+              <Link
+                href={`/delegate`}
+                className={
+                  router.pathname === "/delegate" ? styles.active : null
+                }
+              >
+                Delegate
               </Link>
             </li>
           </ul>
@@ -128,14 +126,10 @@ export default function Header() {
         >
           <ul>
             <li>
-              <Link href={`/`}>
-                <a>Vote</a>
-              </Link>
+              <Link href={`/`}>Vote</Link>
             </li>
             <li>
-              <Link href={`/delegate`}>
-                <a>Delegate</a>
-              </Link>
+              <Link href={`/delegate`}>Delegate</Link>
             </li>
           </ul>
           {address ? (

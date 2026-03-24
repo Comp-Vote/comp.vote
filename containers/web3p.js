@@ -1,106 +1,67 @@
-import { useContext } from "react";
-import Web3 from "web3"; // Web3
-import Web3Modal from "web3modal"; // Web3Modal
-import { useState, useEffect } from "react"; // State management
-import { createContainer } from "unstated-next"; // Unstated-next containerization
-import WalletConnectProvider from "@walletconnect/web3-provider"; // WalletConnectProvider (Web3Modal)
-import { RPCWeb3Provider } from '@compound-finance/comet-extension';
-import { useRPC } from '../components/hooks/useRPC';
-import { Embedded } from "containers"; // Embedded
-
-// Web3Modal provider options
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      // Inject Infura
-      infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
-    },
-  },
-};
+import { useContext, useState, useEffect } from "react";
+import { useAccount, useDisconnect, usePublicClient, useWalletClient } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { isAddress, createPublicClient, createWalletClient, custom } from "viem";
+import { mainnet } from "viem/chains";
+import { createContainer } from "unstated-next";
+import { RPCWeb3Provider } from "@compound-finance/comet-extension";
+import { useRPC } from "../components/hooks/useRPC";
+import { Embedded } from "containers";
 
 function useWeb3() {
   const embedded = useContext(Embedded);
   const rpc = useRPC();
-  const [web3, setWeb3] = useState(null); // Web3 provider
-  const [modal, setModal] = useState(null); // Web3Modal
-  const [address, setAddress] = useState(null); // ETH address
 
-  /**
-   * Sets up web3Modal and saves to state
-   */
-  const setupWeb3Modal = () => {
-    // Create new web3Modal
-    const web3Modal = new Web3Modal({
-      network: "mainnet",
-      cacheProvider: true,
-      providerOptions: providerOptions,
-    });
+  // Wagmi state (non-embedded mode)
+  const { address: wagmiAddress } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { openConnectModal } = useConnectModal();
+  const wagmiPublicClient = usePublicClient();
+  const { data: wagmiWalletClient } = useWalletClient();
 
-    // Set web3Modal
-    setModal(web3Modal);
-  };
+  // Embedded mode state
+  const [embeddedAddress, setEmbeddedAddress] = useState(null);
+  const [embeddedPublicClient, setEmbeddedPublicClient] = useState(null);
+  const [embeddedWalletClient, setEmbeddedWalletClient] = useState(null);
 
-  /**
-   * Authenticate, save web3 provider, and save eth address
-   */
-  const authenticate = async () => {
-    // Toggle modal
-    let provider;
-    if (!embedded) {
-      provider = await modal.connect();
-    } else {
-      provider = new RPCWeb3Provider(rpc.sendRPC);
-    }
-
-    // Generate web3 object and save
-    const web3 = new Web3(provider);
-    setWeb3(web3);
-
-    // Collect address
-    const accounts = await web3.eth.getAccounts();
-    const address = accounts[0];
-    setAddress(address);
-    return;
-  };
-
-  /**
-   * Unauthenticate and clear cache
-   */
-  const unauthenticate = async () => {
-    // Check if logged in
-    if (web3 && web3.currentProvider && web3.currentProvider.close) {
-      // Close provider
-      await web3.currentProvider.close();
-    }
-
-    // Nullify web3 provider and address
-    setAddress(null);
-    setWeb3(null);
-  };
-
-  /**
-   * Checks validity of Ethereum address
-   * @param {String} address to check
-   * @returns {Boolean} true if address is valid
-   */
-  const isValidAddress = (address) => {
-    return web3.utils.isAddress(address);
-  };
-
-  // On mount
   useEffect(() => {
-    // Setup web3modal
-    if (!embedded) {
-      setupWeb3Modal();
+    if (!embedded) return;
+
+    const provider = new RPCWeb3Provider(rpc.sendRPC);
+    const transport = custom(provider);
+    const pubClient = createPublicClient({ chain: mainnet, transport });
+    const walClient = createWalletClient({ chain: mainnet, transport });
+
+    setEmbeddedPublicClient(pubClient);
+    setEmbeddedWalletClient(walClient);
+
+    walClient.getAddresses().then(([addr]) => {
+      setEmbeddedAddress(addr ?? null);
+    });
+  }, [embedded]);
+
+  const address = embedded ? embeddedAddress : wagmiAddress;
+  const publicClient = embedded ? embeddedPublicClient : wagmiPublicClient;
+  const walletClient = embedded ? embeddedWalletClient : wagmiWalletClient;
+
+  const authenticate = () => {
+    if (!embedded) openConnectModal?.();
+  };
+
+  const unauthenticate = () => {
+    if (embedded) {
+      setEmbeddedAddress(null);
     } else {
-      authenticate();
+      disconnect();
     }
-  }, []);
+  };
+
+  const isValidAddress = (addr) => isAddress(addr);
 
   return {
-    web3,
     address,
+    publicClient,
+    walletClient,
     authenticate,
     unauthenticate,
     isValidAddress,

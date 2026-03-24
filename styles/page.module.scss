@@ -130,8 +130,12 @@
     align-items: center;
     button {
       transform: translateY(0);
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 0.6rem 1.2rem;
+      min-height: calc(1em + 1.2rem);
+      min-width: 130px;
       margin: 0px 8px;
       border-radius: 5px;
       border: 1px solid;
@@ -141,8 +145,10 @@
       font-size: 14px;
       font-weight: bold;
 
-      > div {
-        transform: translateY(2px);
+      > span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
     }
 
@@ -219,8 +225,11 @@
 
     button {
       vertical-align: middle;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 0.6rem 1.2rem;
+      min-height: calc(1em + 1.2rem);
       margin: 0px 8px;
       border-radius: 5px;
       border: 1px solid;
@@ -231,8 +240,10 @@
       font-weight: bold;
       min-width: 100px;
 
-      > div {
-        transform: translateY(2px);
+      > span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
     }
 
@@ -361,8 +372,11 @@
 
   button {
     vertical-align: middle;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.6rem 1.2rem;
+    min-height: calc(1em + 1.2rem);
     border-radius: 5px;
     width: 100%;
     border: 1px solid;
@@ -371,6 +385,12 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
+
+    > span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
   button:focus {
