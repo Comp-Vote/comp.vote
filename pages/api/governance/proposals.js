@@ -25,6 +25,10 @@ const statesKey = [
 const MISFORMATTED_PROPOSAL_TITLES = {
   380: "[Gauntlet] Supply Cap Recommendations (12/09/24)",
   450: "OpenZeppelin Security Partnership - Annual Renewal 2025",
+  556: "Cap Recommendations on Ethereum WETH and wstETH comets",
+  555: "Cap Recommendations on Ethereum USDC,USDT,USDS and wstETH comets",
+  554: "Incentive Cuts on Ethereum (Extension to proposal 553)",
+  553: "Incentive Cuts on Ethereum,Linea, Optimism and Unichain"
 };
 
 const initialProposalBravo = 42;
