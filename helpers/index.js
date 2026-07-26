@@ -19,7 +19,6 @@ import {
 import Web3 from "web3"; // Web3
 import axios from "axios"; // Axios requests
 import { recoverTypedSignature } from "@metamask/eth-sig-util"; // EIP-712 sig verification
-import { Defender } from "@openzeppelin/defender-sdk";
 
 /**
  * Instantiates server-side web3 connection
@@ -31,11 +30,11 @@ export const Web3Handler = () => {
   const compToken = new web3.eth.Contract(COMP_ABI, COMP_ADDRESS);
   const governorBravo = new web3.eth.Contract(
     GOVERNOR_BRAVO_ABI,
-    GOVERNANCE_ADDRESS
+    GOVERNANCE_ADDRESS,
   );
   const governorCharlie = new web3.eth.Contract(
     GOVERNOR_CHARLIE_ABI,
-    GOVERNOR_CHARLIE_ADDRESS
+    GOVERNOR_CHARLIE_ADDRESS,
   );
   const multicall = new web3.eth.Contract(MULTICALL_ABI, MULTICALL_ADDRESS);
 
@@ -442,32 +441,34 @@ const vote = async (address, proposalId, support, v, r, s) => {
 };
 
 const relayVote = async (voteSignature) => {
-  const { governorCharlie } = Web3Handler();
-
-  const client = new Defender({
-    relayerApiKey: process.env.DEFENDER_API_KEY,
-    relayerApiSecret: process.env.DEFENDER_API_SECRET,
-  });
+  const { web3, governorCharlie } = Web3Handler();
 
   const web3jsTx = governorCharlie.methods.castVoteBySig(
     voteSignature.proposalId,
     voteSignature.support,
     voteSignature.from,
     `${voteSignature.r}${voteSignature.s.substring(
-      2
-    )}${voteSignature.v.substring(2)}`
+      2,
+    )}${voteSignature.v.substring(2)}`,
+  );
+
+  const account = web3.eth.accounts.privateKeyToAccount(
+    process.env.PRIVATE_KEY,
   );
 
   const tx = {
+    from: account.address,
     to: GOVERNOR_CHARLIE_ADDRESS,
     data: web3jsTx.encodeABI(),
-    gasLimit: Math.round((await web3jsTx.estimateGas()) * 1.2),
+    gas: Math.round((await web3jsTx.estimateGas({ from: account.address })) * 1.2),
     value: 0,
     maxPriorityFeePerGas: "500000000",
-    maxFeePerGas: "50000000000"
+    maxFeePerGas: "50000000000",
   };
 
-  return (await client.relaySigner.sendTransaction(tx)).hash;
+  const signed = await account.signTransaction(tx);
+  const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
+  return receipt.transactionHash;
 };
 
 /**
@@ -554,7 +555,7 @@ const delegate = async (address, delegatee, nonce, expiry, v, r, s) => {
   // Send notification to admin using telegram
   if (typeof process.env.NOTIFICATION_HOOK != "undefined") {
     await axios.get(
-      process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig"
+      process.env.NOTIFICATION_HOOK + "New comp.vote delegation sig",
     );
   }
 };
